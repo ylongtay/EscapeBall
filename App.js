@@ -18,14 +18,14 @@ export default function App() {
   const [speedMultiplier, setSpeedMultiplier] = useState(initialSpeedMultiplier);
 
   useEffect(() => {
-    Accelerometer.setUpdateInterval(100);
+    Accelerometer.setUpdateInterval(10);
 
     const updateSpeedMultiplier = () => {
       const duration = (Date.now() - startTime) / 1000; // duration in seconds
       setSpeedMultiplier(initialSpeedMultiplier + duration * 0.1); // Increase multiplier over time
     };
 
-    const intervalId = setInterval(updateSpeedMultiplier, 1000); // Update every second
+    const intervalId = setInterval(updateSpeedMultiplier, 100); // Update every second
 
     const subscription = Accelerometer.addListener((accelerometerData) => {
       const { x, y } = accelerometerData;
