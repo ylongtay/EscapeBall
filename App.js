@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { Accelerometer } from "expo-sensors";
-import { Dimensions } from "react-native";
-import Svg, { Circle } from "react-native-svg";
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Accelerometer } from 'expo-sensors';
+import { Dimensions } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get('window');
 const ballRadius = 20;
 
 export default function App() {
@@ -14,14 +14,15 @@ export default function App() {
   });
 
   const [startTime] = useState(Date.now);
-  const [speedMultiplier, setSpeedMultiplier] = useState(10);
+  const [initialSpeedMultiplier] = useState(80); // Initial speed multiplier as a state variable
+  const [speedMultiplier, setSpeedMultiplier] = useState(initialSpeedMultiplier);
 
   useEffect(() => {
     Accelerometer.setUpdateInterval(100);
 
     const updateSpeedMultiplier = () => {
       const duration = (Date.now() - startTime) / 1000; // duration in seconds
-      setSpeedMultiplier(10 + duration * 0.1); // Increase multiplier over time
+      setSpeedMultiplier(initialSpeedMultiplier + duration * 0.1); // Increase multiplier over time
     };
 
     const intervalId = setInterval(updateSpeedMultiplier, 1000); // Update every second
