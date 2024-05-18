@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Accelerometer } from 'expo-sensors';
-import { Dimensions } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
 const { width, height } = Dimensions.get('window');
@@ -14,7 +14,7 @@ export default function App() {
   });
 
   const [startTime] = useState(Date.now);
-  const [initialSpeedMultiplier] = useState(80); // Initial speed multiplier as a state variable
+  const [initialSpeedMultiplier] = useState(100); // Initial speed multiplier as a state variable
   const [speedMultiplier, setSpeedMultiplier] = useState(initialSpeedMultiplier);
 
   useEffect(() => {
@@ -30,8 +30,12 @@ export default function App() {
     const subscription = Accelerometer.addListener((accelerometerData) => {
       const { x, y } = accelerometerData;
       setBallPosition((prevPosition) => {
-        let newX = prevPosition.x + x * speedMultiplier;
-        let newY = prevPosition.y - y * speedMultiplier;
+        // Adjust the direction based on the platform
+        const adjustedX = Platform.OS === 'ios' ? x : -x;
+        const adjustedY = Platform.OS === 'ios' ? y : -y;
+
+        let newX = prevPosition.x + adjustedX * speedMultiplier;
+        let newY = prevPosition.y - adjustedY * speedMultiplier;
 
         // Prevent the ball from going off the canvas
         if (newX + ballRadius > width) newX = width - ballRadius;
