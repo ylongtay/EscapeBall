@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Accelerometer } from 'expo-sensors';
-import { Dimensions } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { Accelerometer } from "expo-sensors";
+import { Dimensions } from "react-native";
+import Svg, { Circle } from "react-native-svg";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 const ballRadius = 20;
 
 export default function App() {
@@ -13,14 +13,24 @@ export default function App() {
     y: height / 2,
   });
 
+  const [startTime] = useState(Date.now);
+  const [speedMultiplier, setSpeedMultiplier] = useState(10);
+
   useEffect(() => {
     Accelerometer.setUpdateInterval(100);
+
+    const updateSpeedMultiplier = () => {
+      const duration = (Date.now() - startTime) / 1000; // duration in seconds
+      setSpeedMultiplier(10 + duration * 0.1); // Increase multiplier over time
+    };
+
+    const intervalId = setInterval(updateSpeedMultiplier, 1000); // Update every second
 
     const subscription = Accelerometer.addListener((accelerometerData) => {
       const { x, y } = accelerometerData;
       setBallPosition((prevPosition) => {
-        let newX = prevPosition.x + x * 10;
-        let newY = prevPosition.y - y * 10;
+        let newX = prevPosition.x + x * speedMultiplier;
+        let newY = prevPosition.y - y * speedMultiplier;
 
         // Prevent the ball from going off the canvas
         if (newX + ballRadius > width) newX = width - ballRadius;
@@ -32,8 +42,11 @@ export default function App() {
       });
     });
 
-    return () => subscription.remove();
-  }, []);
+    return () => {
+      subscription.remove();
+      clearInterval(intervalId);
+    };
+  }, [speedMultiplier]);
 
   return (
     <View style={styles.container}>
