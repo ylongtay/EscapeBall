@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Accelerometer } from 'expo-sensors';
-import { Dimensions, Platform } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import { Accelerometer } from "expo-sensors";
+import { Dimensions, Platform } from "react-native";
+import Svg, { Circle } from "react-native-svg";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 const ballRadius = 20;
 
 export default function App() {
@@ -15,7 +15,9 @@ export default function App() {
 
   const [startTime] = useState(Date.now);
   const [initialSpeedMultiplier] = useState(100); // Initial speed multiplier as a state variable
-  const [speedMultiplier, setSpeedMultiplier] = useState(initialSpeedMultiplier);
+  const [speedMultiplier, setSpeedMultiplier] = useState(
+    initialSpeedMultiplier
+  );
 
   useEffect(() => {
     Accelerometer.setUpdateInterval(10);
@@ -31,8 +33,8 @@ export default function App() {
       const { x, y } = accelerometerData;
       setBallPosition((prevPosition) => {
         // Adjust the direction based on the platform
-        const adjustedX = Platform.OS === 'ios' ? x : -x;
-        const adjustedY = Platform.OS === 'ios' ? y : -y;
+        const adjustedX = Platform.OS === "ios" ? x : -x;
+        const adjustedY = Platform.OS === "ios" ? y : -y;
 
         let newX = prevPosition.x + adjustedX * speedMultiplier;
         let newY = prevPosition.y - adjustedY * speedMultiplier;
