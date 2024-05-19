@@ -8,7 +8,7 @@ import {
   Text,
 } from "react-native";
 import { Accelerometer } from "expo-sensors";
-import Svg, { Circle } from "react-native-svg";
+import Svg, { Circle, Rect } from "react-native-svg";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -23,43 +23,108 @@ const WelcomeScreen = ({ navigation }) => (
 );
 
 const GameMenu = ({ route, navigation }) => {
-  const { onRestart } = route.params;
+  const { timeTaken } = route.params || {};
 
   return (
     <View style={styles.centeredContainer}>
       <Button
         title="Restart Game"
-        onPress={() => {
-          onRestart();
-          navigation.navigate("Game");
-        }}
+        onPress={() => navigation.navigate("Game", { restart: true })}
       />
       <Button
         title="Main Menu"
         onPress={() => navigation.navigate("Welcome")}
       />
+      {timeTaken !== undefined && timeTaken !== null && (
+        <Text style={styles.timeText}>
+          Time Taken: {timeTaken.toFixed(2)} seconds
+        </Text>
+      )}
     </View>
   );
 };
 
-const Game = ({ navigation }) => {
+const generateMaze = () => {
+  const maze = [];
+  const cellSize = 40;
+  const numCols = Math.floor(width / cellSize);
+  const numRows = Math.floor(height / cellSize);
+
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      if (Math.random() < 0.3) {
+        maze.push({
+          x: j * cellSize,
+          y: i * cellSize,
+          width: cellSize,
+          height: cellSize,
+        });
+      }
+    }
+  }
+
+  return maze;
+};
+
+const isValidPoint = (point, maze) => {
+  return !maze.some(
+    (wall) =>
+      point.x + ballRadius > wall.x &&
+      point.x - ballRadius < wall.x + wall.width &&
+      point.y + ballRadius > wall.y &&
+      point.y - ballRadius < wall.y + wall.height
+  );
+};
+
+const getRandomPoint = (maze) => {
+  let point;
+  const cellSize = 40;
+
+  while (true) {
+    point = {
+      x: Math.floor(Math.random() * (width - cellSize)),
+      y: Math.floor(Math.random() * (height - cellSize)),
+    };
+
+    if (isValidPoint(point, maze)) break;
+  }
+
+  return point;
+};
+
+const Game = ({ navigation, route }) => {
   const [ballPosition, setBallPosition] = useState({
     x: width / 2,
     y: height / 2,
   });
   const [isPaused, setIsPaused] = useState(false);
   const [startTime, setStartTime] = useState(Date.now());
-  const [initialSpeedMultiplier] = useState(100);
+  const [initialSpeedMultiplier] = useState(200); // Increased initial speed
   const [speedMultiplier, setSpeedMultiplier] = useState(
     initialSpeedMultiplier
   );
+  const [maze, setMaze] = useState(generateMaze());
+  const [startPoint, setStartPoint] = useState(getRandomPoint(generateMaze()));
+  const [endPoint, setEndPoint] = useState(getRandomPoint(generateMaze()));
+  const [timeTaken, setTimeTaken] = useState(null);
 
   useEffect(() => {
-    Accelerometer.setUpdateInterval(10);
+    if (route.params?.restart) {
+      handleRestart();
+      navigation.setParams({ restart: false });
+    }
+  }, [route.params?.restart]);
+
+  useEffect(() => {
+    setBallPosition(startPoint);
+  }, [startPoint]);
+
+  useEffect(() => {
+    Accelerometer.setUpdateInterval(16);
 
     const updateSpeedMultiplier = () => {
       const duration = (Date.now() - startTime) / 1000;
-      setSpeedMultiplier(initialSpeedMultiplier + duration * 0.1);
+      setSpeedMultiplier(initialSpeedMultiplier + duration * 5); // Increase acceleration rate
     };
 
     const intervalId = setInterval(updateSpeedMultiplier, 100);
@@ -71,13 +136,41 @@ const Game = ({ navigation }) => {
           const adjustedX = Platform.OS === "ios" ? x : -x;
           const adjustedY = Platform.OS === "ios" ? y : -y;
 
-          let newX = prevPosition.x + adjustedX * speedMultiplier;
-          let newY = prevPosition.y - adjustedY * speedMultiplier;
+          let newX = prevPosition.x + adjustedX * speedMultiplier * 0.02;
+          let newY = prevPosition.y - adjustedY * speedMultiplier * 0.02;
 
           if (newX + ballRadius > width) newX = width - ballRadius;
           if (newX - ballRadius < 0) newX = ballRadius;
           if (newY + ballRadius > height) newY = height - ballRadius;
           if (newY - ballRadius < 0) newY = ballRadius;
+
+          for (let wall of maze) {
+            if (
+              newX + ballRadius > wall.x &&
+              newX - ballRadius < wall.x + wall.width &&
+              newY + ballRadius > wall.y &&
+              newY - ballRadius < wall.y + wall.height
+            ) {
+              newX = prevPosition.x;
+              newY = prevPosition.y;
+              break;
+            }
+          }
+
+          if (
+            newX + ballRadius > endPoint.x &&
+            newX - ballRadius < endPoint.x + 20 &&
+            newY + ballRadius > endPoint.y &&
+            newY - ballRadius < endPoint.y + 20
+          ) {
+            setIsPaused(true);
+            const timeElapsed = (Date.now() - startTime) / 1000;
+            setTimeTaken(timeElapsed);
+            setTimeout(
+              () => navigation.navigate("GameMenu", { timeTaken: timeElapsed }),
+              0
+            );
+          }
 
           return { x: newX, y: newY };
         });
@@ -88,32 +181,61 @@ const Game = ({ navigation }) => {
       subscription.remove();
       clearInterval(intervalId);
     };
-  }, [isPaused, speedMultiplier]);
+  }, [isPaused, speedMultiplier, maze]);
 
   const handlePause = () => {
     setIsPaused(true);
-    navigation.navigate("GameMenu", { onRestart: handleRestart });
+    setTimeout(() => navigation.navigate("GameMenu", { timeTaken }), 0);
   };
 
   const handleRestart = () => {
-    setBallPosition({ x: width / 2, y: height / 2 });
+    const newMaze = generateMaze();
+    const newStartPoint = getRandomPoint(newMaze);
+    const newEndPoint = getRandomPoint(newMaze);
+
+    setMaze(newMaze);
+    setBallPosition(newStartPoint);
+    setStartPoint(newStartPoint);
+    setEndPoint(newEndPoint);
     setStartTime(Date.now());
     setSpeedMultiplier(initialSpeedMultiplier);
     setIsPaused(false);
-    navigation.navigate("Game");
+    setTimeTaken(null);
   };
 
   return (
     <View style={styles.container}>
       <Svg height={height} width={width}>
+        {maze.map((wall, index) => (
+          <Rect
+            key={index}
+            x={wall.x}
+            y={wall.y}
+            width={wall.width}
+            height={wall.height}
+            fill="black"
+          />
+        ))}
         <Circle
           cx={ballPosition.x}
           cy={ballPosition.y}
           r={ballRadius}
           fill="blue"
         />
+        <Circle
+          cx={startPoint.x}
+          cy={startPoint.y}
+          r={ballRadius}
+          fill="green"
+        />
+        <Circle cx={endPoint.x} cy={endPoint.y} r={ballRadius} fill="red" />
       </Svg>
       <Button title="Pause" onPress={handlePause} />
+      {timeTaken !== null && (
+        <Text style={styles.timeText}>
+          Time Taken: {timeTaken.toFixed(2)} seconds
+        </Text>
+      )}
     </View>
   );
 };
@@ -154,6 +276,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
+  },
+  timeText: {
+    fontSize: 18,
+    marginTop: 20,
   },
 });
 
