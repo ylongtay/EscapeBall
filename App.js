@@ -14,6 +14,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 const { width, height } = Dimensions.get("window");
 const ballRadius = 20;
+const cellSize = ballRadius * 2.5; // Ensure cells are at least 2.5 times the ball's diameter
+const wallThickness = 4;
 
 const WelcomeScreen = ({ navigation }) => (
   <View style={styles.centeredContainer}>
@@ -45,25 +47,73 @@ const GameMenu = ({ route, navigation }) => {
 };
 
 const generateMaze = () => {
-  const maze = [];
-  const cellSize = 40;
   const numCols = Math.floor(width / cellSize);
   const numRows = Math.floor(height / cellSize);
 
-  for (let i = 0; i < numRows; i++) {
-    for (let j = 0; j < numCols; j++) {
-      if (Math.random() < 0.3) {
-        maze.push({
-          x: j * cellSize,
-          y: i * cellSize,
-          width: cellSize,
-          height: cellSize,
-        });
+  const maze = Array(numRows)
+    .fill()
+    .map(() => Array(numCols).fill(false));
+  const walls = new Set();
+
+  const addWalls = (x, y) => {
+    if (x > 0 && !maze[y][x - 1]) walls.add([x - 1, y, x, y].toString());
+    if (x < numCols - 1 && !maze[y][x + 1])
+      walls.add([x + 1, y, x, y].toString());
+    if (y > 0 && !maze[y - 1][x]) walls.add([x, y - 1, x, y].toString());
+    if (y < numRows - 1 && !maze[y + 1][x])
+      walls.add([x, y + 1, x, y].toString());
+  };
+
+  const randomIndex = () => Math.floor(Math.random() * walls.size);
+
+  const createMaze = () => {
+    const startX = Math.floor(Math.random() * numCols);
+    const startY = Math.floor(Math.random() * numRows);
+    maze[startY][startX] = true;
+    addWalls(startX, startY);
+
+    while (walls.size > 0) {
+      const wallArray = Array.from(walls);
+      const randomWallIndex = randomIndex();
+      const wallString = wallArray[randomWallIndex];
+      const [wx, wy, nx, ny] = wallString.split(",").map(Number);
+      walls.delete(wallString);
+
+      if (!maze[ny][nx]) {
+        maze[ny][nx] = true;
+        addWalls(nx, ny);
+
+        const isHorizontal = wx !== nx;
+        const wallX = isHorizontal
+          ? Math.min(wx, nx) * cellSize
+          : wx * cellSize;
+        const wallY = isHorizontal
+          ? wy * cellSize
+          : Math.min(wy, ny) * cellSize;
+        const wallWidth = isHorizontal
+          ? wallThickness
+          : cellSize + wallThickness;
+        const wallHeight = isHorizontal
+          ? cellSize + wallThickness
+          : wallThickness;
+
+        walls.add(
+          {
+            x: wallX,
+            y: wallY,
+            width: wallWidth,
+            height: wallHeight,
+          }.toString()
+        );
       }
     }
-  }
+  };
 
-  return maze;
+  createMaze();
+  return Array.from(walls).map((wallString) => {
+    const [x, y, width, height] = wallString.split(",").map(Number);
+    return { x, y, width, height };
+  });
 };
 
 const isValidPoint = (point, maze) => {
@@ -78,7 +128,6 @@ const isValidPoint = (point, maze) => {
 
 const getRandomPoint = (maze) => {
   let point;
-  const cellSize = 40;
 
   while (true) {
     point = {
@@ -104,8 +153,8 @@ const Game = ({ navigation, route }) => {
     initialSpeedMultiplier
   );
   const [maze, setMaze] = useState(generateMaze());
-  const [startPoint, setStartPoint] = useState(getRandomPoint(generateMaze()));
-  const [endPoint, setEndPoint] = useState(getRandomPoint(generateMaze()));
+  const [startPoint, setStartPoint] = useState(getRandomPoint(maze));
+  const [endPoint, setEndPoint] = useState(getRandomPoint(maze));
   const [timeTaken, setTimeTaken] = useState(null);
 
   useEffect(() => {
