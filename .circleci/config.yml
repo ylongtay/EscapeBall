@@ -1,0 +1,101 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.6.0
+  maven: circleci/maven@1.4.1
+  snyk: snyk/snyk@2.1.0
+
+executors: # Executors define the environment in which the steps of a job will be run, allowing you to reuse a single executor definition across multiple jobs.
+  openjdk-with-postgres:
+    docker: # Environment. Multiple Docker images are most useful when you need to connect to a resource over the network.
+      - image: cimg/openjdk:21.0.2 # The primary base image.
+        environment:
+          PGHOST: 127.0.0.1 # The hostname (or IP) of the postgres server to use.
+
+      - image: cimg/postgres:16.2 # The secondary image.
+        environment:
+          POSTGRES_PASSWORD: password # Must not be empty or undefined. It is trust authentication locally (inside the same container) so the password is not actually used.
+          POSTGRES_DB: the_review_room # This optional environment variable defines the default database created when the image is first started (default is postgres).
+
+jobs:
+  publish: # Also known as the build-and-push.
+    executor: docker/docker # This executor is provided by the circleci/docker orb.
+
+    steps:
+      - checkout # Checkout the app source code.
+      - setup_remote_docker # When setup_remote_docker executes, any Docker commands you use will execute locally on the virtual machine used to spin up containers for your job.
+      - docker/check # Sanity check to make sure you can build a Docker image. Check that Docker username and password environment variables are set, then run docker login to ensure that you can push the built image.
+      - docker/build: # Build the image.
+          image: nhkhai/the-review-room # Name of the image to build.
+          tag: latest # Image tag, defaults to the value of $CIRCLE_SHA1. Consider setting this dynamically based on the tag using env vars or CircleCI parameters.
+      - docker/push: # Pushes the image to the specified account in the environment variables.
+          image: nhkhai/the-review-room # Name of the image to push.
+          tag: latest # Comma-separated list of image tag, defaults to the value of $CIRCLE_SHA1. Consider setting this dynamically based on the tag using env vars or CircleCI parameters.
+
+  scan:
+    docker:
+      - image: cimg/base:current # Define the execution environment in which the steps of a job will run. This is the base image.
+
+    environment: # The environment allows us to create an environment for the job and allows us to create custom environment variables.
+      IMAGE_NAME: nhkhai/the-review-room # The target container image to scan.
+
+    steps:
+      - checkout # Checkout the app source code.
+      - setup_remote_docker # When setup_remote_docker executes, any Docker commands you use will execute locally on the virtual machine used to spin up containers for your job.
+      - docker/check # Sanity check to make sure you can build a Docker image. Check that Docker username and password environment variables are set, then run docker login to ensure that you can push the built image.
+      - run: docker build -t $IMAGE_NAME . # $IMAGE_NAME gets the value from the environment we created above.
+      - snyk/scan: # This triggers the Snyk scan using the preconfigured SNYK_TOKEN environmental variable.
+          docker-image-name: $IMAGE_NAME # The image name, if scanning a container image.
+          fail-on-issues: false # This specifies if builds should be failed or continued based on issues found by Snyk. If false, the failure is hidden and marked as a pass.
+          severity-threshold: high # Only report vulnerabilities of provided level or higher (low/medium/high/critical). If param is not present, the default value is low.
+          monitor-on-build: false # If enabled, this takes a current application dependencies snapshot for continuous monitoring by Snyk, if test was successful.
+
+  deploy:
+    docker:
+      - image: cimg/base:current # Define the execution environment in which the steps of a job will run. This is the base image.
+
+    steps:
+      - run:
+          name: Render Deploy Hook
+          # Use the built-in curl client to sends a HTTP request to the Render hosting service via the URL environment variable. This triggers a pre-configured deployment flow to run.
+          command: |
+            curl "$RENDER_DEPLOY_HOOK_URL"
+
+workflows:
+  ci_flow: # Workflow name. This is the name of the workflow, feel free to change it to better match your workflow.
+    jobs:
+      - maven/test: # This will use the circleci/maven orb to do a mvn verify (which includes build and test), then generate the test report.
+          executor: openjdk-with-postgres
+          filters:
+            branches:
+              ignore:
+                - release
+
+      - publish:
+          requires:
+            - maven/test
+
+      - scan:
+          requires:
+            - publish
+
+  cicd_flow:
+    jobs:
+      - maven/test: # This will use the circleci/maven orb to do a mvn verify (which includes build and test), then generate the test report.
+          executor: openjdk-with-postgres
+          filters:
+            branches:
+              only:
+                - release
+
+      - publish:
+          requires:
+            - maven/test
+
+      - scan:
+          requires:
+            - publish
+
+      - deploy:
+          requires:
+            - publish
