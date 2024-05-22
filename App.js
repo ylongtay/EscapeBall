@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; // Import necessary hooks from React.
 import {
   StyleSheet,
   View,
@@ -6,20 +6,21 @@ import {
   Platform,
   Dimensions,
   Text,
-} from "react-native";
-import { Accelerometer } from "expo-sensors";
-import Svg, { Circle, Rect } from "react-native-svg";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+} from "react-native"; // Import React Native components.
+import { Accelerometer } from "expo-sensors"; // Import Accelerometer from expo-sensors to handle accelerometer data.
+import Svg, { Circle, Rect } from "react-native-svg"; // Import Svg and its sub-components for drawing shapes.
+import { NavigationContainer } from "@react-navigation/native"; // Import navigation container.
+import { createStackNavigator } from "@react-navigation/stack"; // Import stack navigator for screen navigation.
 
-const { width, height } = Dimensions.get("window");
-const ballRadius = 15;
+const { width, height } = Dimensions.get("window"); // Get device screen dimensions.
+const ballRadius = 15; // Set radius of the ball
 
+// Define fixed walls for the maze as an array of objects.
 const fixedMaze = [
-  // Define fixed walls for the maze
+  // Define fixed walls for the maze.
 
-  // Add more walls as needed
-  // Horizontal walls
+  // Add more walls as needed.
+  // Horizontal walls.
   { x: 0, y: 100, width: 80, height: 10 },
   { x: 200, y: 100, width: 150, height: 10 },
   { x: 50, y: 200, width: 100, height: 10 },
@@ -29,7 +30,7 @@ const fixedMaze = [
   { x: 200, y: 400, width: 150, height: 10 },
   { x: 50, y: 500, width: 100, height: 10 },
   { x: 250, y: 500, width: 100, height: 10 },
-  // Vertical walls
+  // Vertical walls.
   { x: 150, y: 0, width: 10, height: 150 },
   { x: 150, y: 200, width: 10, height: 150 },
   { x: 100, y: 150, width: 10, height: 100 },
@@ -41,6 +42,7 @@ const fixedMaze = [
   { x: 150, y: 550, width: 10, height: 100 },
 ];
 
+// WelcomeScreen component for the initial screen.
 const WelcomeScreen = ({ navigation }) => (
   <View style={styles.centeredContainer}>
     <Text style={styles.title}>Welcome to Escape Ball</Text>
@@ -48,8 +50,9 @@ const WelcomeScreen = ({ navigation }) => (
   </View>
 );
 
+// GameMenu component for displaying after game ends or pauses.
 const GameMenu = ({ route, navigation }) => {
-  const { timeTaken } = route.params || {};
+  const { timeTaken } = route.params || {}; // Get time taken from navigation params.
 
   return (
     <View style={styles.centeredContainer}>
@@ -70,7 +73,7 @@ const GameMenu = ({ route, navigation }) => {
   );
 };
 
-// Below use to generate random maze
+// Below use to generate random maze.
 // const generateMaze = () => {
 //   const maze = [];
 //   const cellSize = 40;
@@ -104,6 +107,7 @@ const GameMenu = ({ route, navigation }) => {
 //   );
 // };
 
+// Function to check if a point is valid (i.e., not inside a wall).
 const isValidPoint = (point) => {
   return !fixedMaze.some(
     (wall) =>
@@ -114,8 +118,9 @@ const isValidPoint = (point) => {
   );
 };
 
+// Function to get a random valid point on the screen.
 const getRandomPoint = () => {
-  //Remove maze prop for fixed maze
+  // Remove maze prop for fixed maze.
   let point;
   const cellSize = 40;
 
@@ -125,30 +130,33 @@ const getRandomPoint = () => {
       y: Math.floor(Math.random() * (height - cellSize)),
     };
 
-    if (isValidPoint(point)) break; //Remove passing of maze prop for fixed maze
+    // If the point is valid, exit the loop.
+    if (isValidPoint(point)) break; // Remove passing of maze prop for fixed maze.
   }
 
   return point;
 };
 
+// Game component where the main game logic resides.
 const Game = ({ navigation, route }) => {
   const [ballPosition, setBallPosition] = useState({
     x: width / 2,
     y: height / 2,
-  });
-  const [isPaused, setIsPaused] = useState(false);
-  const [startTime, setStartTime] = useState(Date.now());
-  const [initialSpeedMultiplier] = useState(200); // Increased initial speed
+  }); // State to track the ball's position.
+  const [isPaused, setIsPaused] = useState(false); // State to track if the game is paused.
+  const [startTime, setStartTime] = useState(Date.now()); // State to track the start time.
+  const [initialSpeedMultiplier] = useState(200); // Initial speed multiplier for ball movement.
   const [speedMultiplier, setSpeedMultiplier] = useState(
     initialSpeedMultiplier
-  );
+  ); // Speed multiplier state.
   // const [maze, setMaze] = useState(generateMaze());
   // Remove generateMaze() function in getRandomPoint
-  const [startPoint, setStartPoint] = useState(getRandomPoint());
+  const [startPoint, setStartPoint] = useState(getRandomPoint()); // Start point of the ball.
   // Remove generateMaze() function in getRandomPoint
-  const [endPoint, setEndPoint] = useState(getRandomPoint());
-  const [timeTaken, setTimeTaken] = useState(null);
+  const [endPoint, setEndPoint] = useState(getRandomPoint()); // End point of the ball.
+  const [timeTaken, setTimeTaken] = useState(null); // State to track time taken to complete the maze.
 
+  // Effect to handle restart game logic.
   useEffect(() => {
     if (route.params?.restart) {
       handleRestart();
@@ -156,94 +164,103 @@ const Game = ({ navigation, route }) => {
     }
   }, [route.params?.restart]);
 
+  // Effect to set the ball position to start point when the game starts.
   useEffect(() => {
     setBallPosition(startPoint);
   }, [startPoint]);
 
+  // Effect to handle accelerometer data and game logic.
   useEffect(() => {
-    Accelerometer.setUpdateInterval(16);
+    Accelerometer.setUpdateInterval(16); // Set accelerometer update interval to 16ms.
 
     const updateSpeedMultiplier = () => {
-      const duration = (Date.now() - startTime) / 1000;
-      setSpeedMultiplier(initialSpeedMultiplier + duration * 5); // Increase acceleration rate
+      const duration = (Date.now() - startTime) / 1000; // Calculate elapsed time in seconds.
+      setSpeedMultiplier(initialSpeedMultiplier + duration * 5); // Increase speed multiplier over time.
     };
 
-    const intervalId = setInterval(updateSpeedMultiplier, 100);
+    const intervalId = setInterval(updateSpeedMultiplier, 100); // Update speed multiplier every 100ms.
 
+    // Subscribe to accelerometer data
     const subscription = Accelerometer.addListener((accelerometerData) => {
       if (!isPaused) {
-        const { x, y } = accelerometerData;
+        const { x, y } = accelerometerData; // Get x and y data from accelerometer.
         setBallPosition((prevPosition) => {
-          // Added adjusted variable to correct android accelerometer work in opposite direction
+          // Added adjusted variable to correct android accelerometer work in opposite direction. Adjust x and y based on platform (iOS or Android).
           const adjustedX = Platform.OS === "ios" ? x : -x;
           const adjustedY = Platform.OS === "ios" ? y : -y;
 
           let newX = prevPosition.x + adjustedX * speedMultiplier * 0.02;
           let newY = prevPosition.y - adjustedY * speedMultiplier * 0.02;
 
+          // Ensure the ball stays within screen bounds.
           if (newX + ballRadius > width) newX = width - ballRadius;
           if (newX - ballRadius < 0) newX = ballRadius;
           if (newY + ballRadius > height) newY = height - ballRadius;
           if (newY - ballRadius < 0) newY = ballRadius;
 
+          // Check for collisions with maze walls.
           for (let wall of fixedMaze) {
-            //Change maze to fixedMaze
+            //Change maze to fixedMaze.
             if (
               newX + ballRadius > wall.x &&
               newX - ballRadius < wall.x + wall.width &&
               newY + ballRadius > wall.y &&
               newY - ballRadius < wall.y + wall.height
             ) {
-              newX = prevPosition.x;
+              newX = prevPosition.x; // If collision detected, reset position to previous position.
               newY = prevPosition.y;
               break;
             }
           }
 
+          // Check if ball has reached the end point.
           if (
             newX + ballRadius > endPoint.x &&
             newX - ballRadius < endPoint.x + 20 &&
             newY + ballRadius > endPoint.y &&
             newY - ballRadius < endPoint.y + 20
           ) {
-            setIsPaused(true);
-            const timeElapsed = (Date.now() - startTime) / 1000;
-            setTimeTaken(timeElapsed);
+            setIsPaused(true); // Pause the game.
+            const timeElapsed = (Date.now() - startTime) / 1000; // Calculate time taken.
+            setTimeTaken(timeElapsed); // Set time taken state.
             setTimeout(
               () => navigation.navigate("GameMenu", { timeTaken: timeElapsed }),
               0
             );
           }
 
-          return { x: newX, y: newY };
+          return { x: newX, y: newY }; // Update ball position state.
         });
       }
     });
 
+    // Clean up subscription and interval on component unmount.
     return () => {
       subscription.remove();
       clearInterval(intervalId);
     };
-  }, [isPaused, speedMultiplier]); //Remove maze
+  }, [isPaused, speedMultiplier]); // Remove maze.
 
+  // Function to handle game pause.
   const handlePause = () => {
     setIsPaused(true);
     setTimeout(() => navigation.navigate("GameMenu", { timeTaken }), 0);
   };
 
+  // Function to handle game restart.
   const handleRestart = () => {
-    // const newMaze = generateMaze(); //Comment out when random maze not used
-    const newStartPoint = getRandomPoint(); //remove newMaze prop from getRandomPoint()
-    const newEndPoint = getRandomPoint(); //remove newMaze prop from getRandomPoint()
+    // const newMaze = generateMaze(); // Comment out when random maze not used.
+    const newStartPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new start point.
+    const newEndPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new end point.
 
     // setMaze(newMaze);
-    setBallPosition(newStartPoint);
+    setBallPosition(newStartPoint); // Set ball position to new start point.
     setStartPoint(newStartPoint);
     setEndPoint(newEndPoint);
-    setStartTime(Date.now());
-    setSpeedMultiplier(initialSpeedMultiplier);
-    setIsPaused(false);
-    setTimeTaken(null);
+    setStartTime(Date.now()); // Reset start time.
+    setSpeedMultiplier(initialSpeedMultiplier); // Reset speed multiplier.
+    setIsPaused(false); // Unpause the game.
+    setTimeTaken(null); // Reset time taken.
   };
 
   return (
@@ -284,8 +301,10 @@ const Game = ({ navigation, route }) => {
   );
 };
 
+// Create a stack navigator.
 const Stack = createStackNavigator();
 
+// Main App component with navigation.
 const App = () => (
   <NavigationContainer>
     <Stack.Navigator initialRouteName="Welcome">
@@ -308,6 +327,7 @@ const App = () => (
   </NavigationContainer>
 );
 
+// Styles for the components.
 const styles = StyleSheet.create({
   container: {
     flex: 1,
