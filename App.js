@@ -13,7 +13,33 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 const { width, height } = Dimensions.get("window");
-const ballRadius = 20;
+const ballRadius = 15;
+
+const fixedMaze = [
+  // Define fixed walls for the maze
+
+  // Add more walls as needed
+    // Horizontal walls
+    { x: 0, y: 100, width: 150, height: 20 },
+    { x: 200, y: 100, width: 150, height: 20 },
+    { x: 50, y: 200, width: 100, height: 20 },
+    { x: 250, y: 200, width: 100, height: 20 },
+    { x: 100, y: 300, width: 150, height: 20 },
+    { x: 0, y: 400, width: 100, height: 20 },
+    { x: 200, y: 400, width: 150, height: 20 },
+    { x: 50, y: 500, width: 100, height: 20 },
+    { x: 250, y: 500, width: 100, height: 20 },
+    // Vertical walls
+    { x: 150, y: 0, width: 20, height: 150 },
+    { x: 150, y: 200, width: 20, height: 150 },
+    { x: 100, y: 150, width: 20, height: 100 },
+    { x: 250, y: 150, width: 20, height: 100 },
+    { x: 0, y: 300, width: 20, height: 100 },
+    { x: 300, y: 300, width: 20, height: 100 },
+    { x: 50, y: 450, width: 20, height: 100 },
+    { x: 200, y: 450, width: 20, height: 100 },
+    { x: 150, y: 550, width: 20, height: 100 },
+];
 
 const WelcomeScreen = ({ navigation }) => (
   <View style={styles.centeredContainer}>
@@ -44,30 +70,42 @@ const GameMenu = ({ route, navigation }) => {
   );
 };
 
-const generateMaze = () => {
-  const maze = [];
-  const cellSize = 40;
-  const numCols = Math.floor(width / cellSize);
-  const numRows = Math.floor(height / cellSize);
+// Below use to generate random maze
+// const generateMaze = () => {
+//   const maze = [];
+//   const cellSize = 40;
+//   const numCols = Math.floor(width / cellSize);
+//   const numRows = Math.floor(height / cellSize);
 
-  for (let i = 0; i < numRows; i++) {
-    for (let j = 0; j < numCols; j++) {
-      if (Math.random() < 0.3) {
-        maze.push({
-          x: j * cellSize,
-          y: i * cellSize,
-          width: cellSize,
-          height: cellSize,
-        });
-      }
-    }
-  }
+//   for (let i = 0; i < numRows; i++) {
+//     for (let j = 0; j < numCols; j++) {
+//       if (Math.random() < 0.3) {
+//         maze.push({
+//           x: j * cellSize,
+//           y: i * cellSize,
+//           width: cellSize,
+//           height: cellSize,
+//         });
+//       }
+//     }
+//   }
 
-  return maze;
-};
+//   return maze;
+// };
 
-const isValidPoint = (point, maze) => {
-  return !maze.some(
+// Use for random maze valid path
+// const isValidPoint = (point, maze) => {
+//   return !maze.some(
+//     (wall) =>
+//       point.x + ballRadius > wall.x &&
+//       point.x - ballRadius < wall.x + wall.width &&
+//       point.y + ballRadius > wall.y &&
+//       point.y - ballRadius < wall.y + wall.height
+//   );
+// };
+
+const isValidPoint = (point) => {
+  return !fixedMaze.some(
     (wall) =>
       point.x + ballRadius > wall.x &&
       point.x - ballRadius < wall.x + wall.width &&
@@ -76,7 +114,7 @@ const isValidPoint = (point, maze) => {
   );
 };
 
-const getRandomPoint = (maze) => {
+const getRandomPoint = () => { //Remove maze prop for fixed maze
   let point;
   const cellSize = 40;
 
@@ -86,7 +124,7 @@ const getRandomPoint = (maze) => {
       y: Math.floor(Math.random() * (height - cellSize)),
     };
 
-    if (isValidPoint(point, maze)) break;
+    if (isValidPoint(point)) break; //Remove passing of maze prop for fixed maze
   }
 
   return point;
@@ -103,9 +141,11 @@ const Game = ({ navigation, route }) => {
   const [speedMultiplier, setSpeedMultiplier] = useState(
     initialSpeedMultiplier
   );
-  const [maze, setMaze] = useState(generateMaze());
-  const [startPoint, setStartPoint] = useState(getRandomPoint(generateMaze()));
-  const [endPoint, setEndPoint] = useState(getRandomPoint(generateMaze()));
+  // const [maze, setMaze] = useState(generateMaze());
+  // Remove generateMaze() function in getRandomPoint
+  const [startPoint, setStartPoint] = useState(getRandomPoint());
+  // Remove generateMaze() function in getRandomPoint 
+  const [endPoint, setEndPoint] = useState(getRandomPoint());
   const [timeTaken, setTimeTaken] = useState(null);
 
   useEffect(() => {
@@ -133,6 +173,7 @@ const Game = ({ navigation, route }) => {
       if (!isPaused) {
         const { x, y } = accelerometerData;
         setBallPosition((prevPosition) => {
+          // Added adjusted variable to correct android accelerometer work in opposite direction
           const adjustedX = Platform.OS === "ios" ? x : -x;
           const adjustedY = Platform.OS === "ios" ? y : -y;
 
@@ -144,7 +185,7 @@ const Game = ({ navigation, route }) => {
           if (newY + ballRadius > height) newY = height - ballRadius;
           if (newY - ballRadius < 0) newY = ballRadius;
 
-          for (let wall of maze) {
+          for (let wall of fixedMaze) { //Change maze to fixedMaze
             if (
               newX + ballRadius > wall.x &&
               newX - ballRadius < wall.x + wall.width &&
@@ -181,7 +222,7 @@ const Game = ({ navigation, route }) => {
       subscription.remove();
       clearInterval(intervalId);
     };
-  }, [isPaused, speedMultiplier, maze]);
+  }, [isPaused, speedMultiplier]); //Remove maze
 
   const handlePause = () => {
     setIsPaused(true);
@@ -189,11 +230,11 @@ const Game = ({ navigation, route }) => {
   };
 
   const handleRestart = () => {
-    const newMaze = generateMaze();
-    const newStartPoint = getRandomPoint(newMaze);
-    const newEndPoint = getRandomPoint(newMaze);
+    // const newMaze = generateMaze(); //Comment out when random maze not used
+    const newStartPoint = getRandomPoint(); //remove newMaze prop from getRandomPoint()
+    const newEndPoint = getRandomPoint(); //remove newMaze prop from getRandomPoint()
 
-    setMaze(newMaze);
+    // setMaze(newMaze);
     setBallPosition(newStartPoint);
     setStartPoint(newStartPoint);
     setEndPoint(newEndPoint);
@@ -206,7 +247,8 @@ const Game = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <Svg height={height} width={width}>
-        {maze.map((wall, index) => (
+        {/* {maze.map((wall, index) => ( */}
+        {fixedMaze.map((wall, index) => (
           <Rect
             key={index}
             x={wall.x}
@@ -228,7 +270,12 @@ const Game = ({ navigation, route }) => {
           r={ballRadius}
           fill="green"
         />
-        <Circle cx={endPoint.x} cy={endPoint.y} r={ballRadius} fill="red" />
+        <Circle 
+          cx={endPoint.x} 
+          cy={endPoint.y} 
+          r={ballRadius} 
+          fill="red" 
+        />
       </Svg>
       <Button title="Pause" onPress={handlePause} />
       {timeTaken !== null && (
@@ -280,6 +327,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 18,
     marginTop: 20,
+    color: "red",
   },
 });
 
