@@ -20,7 +20,7 @@ const fixedMaze = [
 
   // Add more walls as needed
   // Horizontal walls
-  { x: 0, y: 100, width: 150, height: 10 },
+  { x: 0, y: 100, width: 80, height: 10 },
   { x: 200, y: 100, width: 150, height: 10 },
   { x: 50, y: 200, width: 100, height: 10 },
   { x: 250, y: 200, width: 100, height: 10 },
