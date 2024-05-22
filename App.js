@@ -19,26 +19,26 @@ const fixedMaze = [
   // Define fixed walls for the maze
 
   // Add more walls as needed
-    // Horizontal walls
-    { x: 0, y: 100, width: 150, height: 20 },
-    { x: 200, y: 100, width: 150, height: 20 },
-    { x: 50, y: 200, width: 100, height: 20 },
-    { x: 250, y: 200, width: 100, height: 20 },
-    { x: 100, y: 300, width: 150, height: 20 },
-    { x: 0, y: 400, width: 100, height: 20 },
-    { x: 200, y: 400, width: 150, height: 20 },
-    { x: 50, y: 500, width: 100, height: 20 },
-    { x: 250, y: 500, width: 100, height: 20 },
-    // Vertical walls
-    { x: 150, y: 0, width: 20, height: 150 },
-    { x: 150, y: 200, width: 20, height: 150 },
-    { x: 100, y: 150, width: 20, height: 100 },
-    { x: 250, y: 150, width: 20, height: 100 },
-    { x: 0, y: 300, width: 20, height: 100 },
-    { x: 300, y: 300, width: 20, height: 100 },
-    { x: 50, y: 450, width: 20, height: 100 },
-    { x: 200, y: 450, width: 20, height: 100 },
-    { x: 150, y: 550, width: 20, height: 100 },
+  // Horizontal walls
+  { x: 0, y: 100, width: 150, height: 10 },
+  { x: 200, y: 100, width: 150, height: 10 },
+  { x: 50, y: 200, width: 100, height: 10 },
+  { x: 250, y: 200, width: 100, height: 10 },
+  { x: 100, y: 300, width: 150, height: 10 },
+  { x: 0, y: 400, width: 100, height: 10 },
+  { x: 200, y: 400, width: 150, height: 10 },
+  { x: 50, y: 500, width: 100, height: 10 },
+  { x: 250, y: 500, width: 100, height: 10 },
+  // Vertical walls
+  { x: 150, y: 0, width: 10, height: 150 },
+  { x: 150, y: 200, width: 10, height: 150 },
+  { x: 100, y: 150, width: 10, height: 100 },
+  { x: 250, y: 150, width: 10, height: 100 },
+  { x: 0, y: 300, width: 10, height: 100 },
+  { x: 300, y: 300, width: 10, height: 100 },
+  { x: 50, y: 450, width: 10, height: 100 },
+  { x: 200, y: 450, width: 10, height: 100 },
+  { x: 150, y: 550, width: 10, height: 100 },
 ];
 
 const WelcomeScreen = ({ navigation }) => (
@@ -114,7 +114,8 @@ const isValidPoint = (point) => {
   );
 };
 
-const getRandomPoint = () => { //Remove maze prop for fixed maze
+const getRandomPoint = () => {
+  //Remove maze prop for fixed maze
   let point;
   const cellSize = 40;
 
@@ -144,7 +145,7 @@ const Game = ({ navigation, route }) => {
   // const [maze, setMaze] = useState(generateMaze());
   // Remove generateMaze() function in getRandomPoint
   const [startPoint, setStartPoint] = useState(getRandomPoint());
-  // Remove generateMaze() function in getRandomPoint 
+  // Remove generateMaze() function in getRandomPoint
   const [endPoint, setEndPoint] = useState(getRandomPoint());
   const [timeTaken, setTimeTaken] = useState(null);
 
@@ -185,7 +186,8 @@ const Game = ({ navigation, route }) => {
           if (newY + ballRadius > height) newY = height - ballRadius;
           if (newY - ballRadius < 0) newY = ballRadius;
 
-          for (let wall of fixedMaze) { //Change maze to fixedMaze
+          for (let wall of fixedMaze) {
+            //Change maze to fixedMaze
             if (
               newX + ballRadius > wall.x &&
               newX - ballRadius < wall.x + wall.width &&
@@ -270,12 +272,7 @@ const Game = ({ navigation, route }) => {
           r={ballRadius}
           fill="green"
         />
-        <Circle 
-          cx={endPoint.x} 
-          cy={endPoint.y} 
-          r={ballRadius} 
-          fill="red" 
-        />
+        <Circle cx={endPoint.x} cy={endPoint.y} r={ballRadius} fill="red" />
       </Svg>
       <Button title="Pause" onPress={handlePause} />
       {timeTaken !== null && (
