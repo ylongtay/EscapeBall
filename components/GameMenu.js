@@ -1,4 +1,6 @@
-import { Button, Text, View } from "react-native"; // Import React Native components.
+import React from "react";
+import { BackHandler, Button, Text, View } from "react-native"; // Import React Native components.
+import { useFocusEffect } from "@react-navigation/native";
 
 import styles from "../styles.js";
 
@@ -6,6 +8,28 @@ import styles from "../styles.js";
 const GameMenu = ({ route, navigation }) => {
   // Get time taken and gameCompleted from navigation params.
   const { timeTaken, gameCompleted } = route.params || {};
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        if (!gameCompleted) {
+          // If the game is not completed, resume the game.
+          navigation.navigate("Game", { restart: false });
+        } else {
+          // If the game is completed, navigate to the main menu.
+          navigation.navigate("Welcome");
+        }
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress
+      );
+
+      return () => subscription.remove();
+    }, [navigation, gameCompleted])
+  );
 
   // Return the GameMenu component.
   return (
