@@ -237,6 +237,9 @@ const Game = ({ navigation, route }) => {
 
   // Function to handle game pause.
   const handlePause = () => {
+    // If pause button is pressed, calculate time taken and pause the game.
+    const timeElapsed = (Date.now() - startTime) / 1000; // Calculate time taken.
+    setTimeTaken(timeElapsed); // Set time taken state.
     // Pause the game and navigate to the game menu screen.
     console.log("Pause button pressed, isPaused state before set:", isPaused);
     setIsPaused(true);
