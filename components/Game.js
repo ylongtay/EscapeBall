@@ -3,6 +3,8 @@ import { View, Button, Platform, Text } from "react-native"; // Import React Nat
 import { Accelerometer } from "expo-sensors"; // Import Accelerometer from expo-sensors to handle accelerometer data.
 import Svg, { Circle, Rect } from "react-native-svg"; // Import Svg and its sub-components for drawing shapes.
 
+import "../App.css";
+
 // Game component where the main game logic resides.
 const Game = ({ navigation, route }) => {
   const [ballPosition, setBallPosition] = useState({
