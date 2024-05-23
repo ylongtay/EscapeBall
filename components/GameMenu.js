@@ -7,7 +7,7 @@ const GameMenu = ({ route, navigation }) => {
   const { timeTaken } = route.params || {}; // Get time taken from navigation params.
 
   return (
-    <View style={styles.centeredContainer}>
+    <View style={centeredContainer}>
       <Button
         title="Restart Game"
         onPress={() => navigation.navigate("Game", { restart: true })}
@@ -17,9 +17,7 @@ const GameMenu = ({ route, navigation }) => {
         onPress={() => navigation.navigate("Welcome")}
       />
       {timeTaken !== undefined && timeTaken !== null && (
-        <Text style={styles.timeText}>
-          Time Taken: {timeTaken.toFixed(2)} seconds
-        </Text>
+        <Text style={timeText}>Time Taken: {timeTaken.toFixed(2)} seconds</Text>
       )}
     </View>
   );
