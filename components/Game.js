@@ -3,7 +3,7 @@ import { Button, Dimensions, Platform, Text, View } from "react-native"; // Impo
 import { Accelerometer } from "expo-sensors"; // Import Accelerometer from expo-sensors to handle accelerometer data.
 import Svg, { Circle, Rect } from "react-native-svg"; // Import Svg and its sub-components for drawing shapes.
 
-import styles from "../styles.css";
+import styles from "../styles.js";
 
 const { width, height } = Dimensions.get("window"); // Get device screen dimensions.
 const ballRadius = 15; // Set radius of the ball.
