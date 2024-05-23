@@ -44,7 +44,7 @@ const Game = ({ navigation, route }) => {
       setSpeedMultiplier(initialSpeedMultiplier + duration * 5); // Increase speed multiplier over time.
     };
 
-    const intervalId = setInterval(updateSpeedMultiplier, 100); // Update speed multiplier every 100ms.
+    const intervalId = setInterval(updateSpeedMultiplier, 100); // Update speed multiplier every 100ms to increase the acceleration rate.
 
     // Subscribe to accelerometer data
     const subscription = Accelerometer.addListener((accelerometerData) => {
@@ -65,6 +65,7 @@ const Game = ({ navigation, route }) => {
           if (newY - ballRadius < 0) newY = ballRadius;
 
           // Check for collisions with maze walls.
+          //   for (let wall of maze) {
           for (let wall of fixedMaze) {
             //Change maze to fixedMaze.
             if (
@@ -105,6 +106,7 @@ const Game = ({ navigation, route }) => {
       subscription.remove();
       clearInterval(intervalId);
     };
+    //   }, [isPaused, speedMultiplier, maze]); // Remove maze.
   }, [isPaused, speedMultiplier]); // Remove maze.
 
   // Function to handle game pause.
@@ -115,7 +117,10 @@ const Game = ({ navigation, route }) => {
 
   // Function to handle game restart.
   const handleRestart = () => {
-    // const newMaze = generateMaze(); // Comment out when random maze not used.
+    // Comment out when random maze not used.
+    // const newMaze = generateMaze();
+    // const newStartPoint = getRandomPoint(newMaze);
+    // const newEndPoint = getRandomPoint(newMaze);
     const newStartPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new start point.
     const newEndPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new end point.
 

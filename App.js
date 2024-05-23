@@ -67,7 +67,9 @@ const fixedMaze = [
 // };
 
 // Function to check if a point is valid (i.e., not inside a wall).
+// const isValidPoint = (point, maze) => {
 const isValidPoint = (point) => {
+  // return !maze.some(
   return !fixedMaze.some(
     (wall) =>
       point.x + ballRadius > wall.x &&
@@ -78,6 +80,7 @@ const isValidPoint = (point) => {
 };
 
 // Function to get a random valid point on the screen.
+// const getRandomPoint = (maze) => {
 const getRandomPoint = () => {
   // Remove maze prop for fixed maze.
   let point;
@@ -90,6 +93,7 @@ const getRandomPoint = () => {
     };
 
     // If the point is valid, exit the loop.
+    // if (isValidPoint(point, maze)) break;
     if (isValidPoint(point)) break; // Remove passing of maze prop for fixed maze.
   }
 
