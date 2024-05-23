@@ -234,7 +234,7 @@ const Game = ({ navigation, route }) => {
 
   useEffect(() => {
     console.log("isPaused state updated:", isPaused);
-    console.log("Time taken:", timeTaken);
+    console.log("Time taken:", timeTaken, "seconds");
     // if (isPaused) {
     if (isPaused && timeTaken !== null) {
       // navigation.navigate("GameMenu", { timeTaken });
