@@ -5,8 +5,10 @@ import Svg, { Circle, Rect } from "react-native-svg"; // Import Svg and its sub-
 
 import styles from "../styles.js";
 
-const { width, height } = Dimensions.get("window"); // Get device screen dimensions.
-const ballRadius = 15; // Set radius of the ball.
+// Get device screen dimensions.
+const { width, height } = Dimensions.get("window");
+// Set radius of the ball.
+const ballRadius = 15;
 
 // Define fixed walls for the maze as an array of objects.
 const fixedMaze = [
@@ -88,7 +90,9 @@ const getRandomPoint = () => {
   let point;
   const cellSize = 40;
 
+  // Loop until a valid point is found.
   while (true) {
+    // Generate a random point on the screen.
     point = {
       x: Math.floor(Math.random() * (width - cellSize)),
       y: Math.floor(Math.random() * (height - cellSize)),
@@ -99,11 +103,13 @@ const getRandomPoint = () => {
     if (isValidPoint(point)) break; // Remove passing of maze prop for fixed maze.
   }
 
+  // Return the random point.
   return point;
 };
 
 // Game component where the main game logic resides.
 const Game = ({ navigation, route }) => {
+  // Define state variables for the game.
   const [ballPosition, setBallPosition] = useState({
     x: width / 2,
     y: height / 2,
@@ -144,6 +150,7 @@ const Game = ({ navigation, route }) => {
   useEffect(() => {
     Accelerometer.setUpdateInterval(16); // Set accelerometer update interval to 16ms.
 
+    // Function to update speed multiplier over time.
     const updateSpeedMultiplier = () => {
       const duration = (Date.now() - startTime) / 1000; // Calculate elapsed time in seconds.
       setSpeedMultiplier(initialSpeedMultiplier + duration * 5); // Increase speed multiplier over time.
@@ -151,15 +158,18 @@ const Game = ({ navigation, route }) => {
 
     const intervalId = setInterval(updateSpeedMultiplier, 100); // Update speed multiplier every 100ms to increase the acceleration rate.
 
-    // Subscribe to accelerometer data
+    // Subscribe to accelerometer data.
     const subscription = Accelerometer.addListener((accelerometerData) => {
+      // Check if the game is not paused.
       if (!isPaused) {
         const { x, y } = accelerometerData; // Get x and y data from accelerometer.
+        // Update ball position based on accelerometer data.
         setBallPosition((prevPosition) => {
           // Added adjusted variable to correct android accelerometer work in opposite direction. Adjust x and y based on platform (iOS or Android).
           const adjustedX = Platform.OS === "ios" ? x : -x;
           const adjustedY = Platform.OS === "ios" ? y : -y;
 
+          // Calculate new ball position based on accelerometer data.
           let newX = prevPosition.x + adjustedX * speedMultiplier * 0.02;
           let newY = prevPosition.y - adjustedY * speedMultiplier * 0.02;
 
@@ -173,13 +183,15 @@ const Game = ({ navigation, route }) => {
           //   for (let wall of maze) {
           for (let wall of fixedMaze) {
             //Change maze to fixedMaze.
+            // Check if the ball collides with a wall.
             if (
               newX + ballRadius > wall.x &&
               newX - ballRadius < wall.x + wall.width &&
               newY + ballRadius > wall.y &&
               newY - ballRadius < wall.y + wall.height
             ) {
-              newX = prevPosition.x; // If collision detected, reset position to previous position.
+              // If collision detected, reset position to previous position.
+              newX = prevPosition.x;
               newY = prevPosition.y;
               break;
             }
@@ -192,10 +204,12 @@ const Game = ({ navigation, route }) => {
             newY + ballRadius > endPoint.y &&
             newY - ballRadius < endPoint.y + 20
           ) {
+            // If end point reached, pause the game and navigate to the game menu screen.
             setIsPaused(true); // Pause the game.
             const timeElapsed = (Date.now() - startTime) / 1000; // Calculate time taken.
             setTimeTaken(timeElapsed); // Set time taken state.
             setTimeout(
+              // Navigate to the game menu screen after 0ms.
               () => navigation.navigate("GameMenu", { timeTaken: timeElapsed }),
               0
             );
@@ -208,10 +222,13 @@ const Game = ({ navigation, route }) => {
 
     // Clean up subscription and interval on component unmount.
     return () => {
+      // Unsubscribe from accelerometer data.
       subscription.remove();
+      // Clear interval for speed multiplier update.
       clearInterval(intervalId);
     };
     //   }, [isPaused, speedMultiplier, maze]); // Remove maze.
+    // Remove maze prop from useEffect dependency array.
   }, [isPaused, speedMultiplier]); // Remove maze.
 
   // Function to handle game pause.
@@ -234,8 +251,8 @@ const Game = ({ navigation, route }) => {
     // setMaze(newMaze);
     // Remove maze prop from setBallPosition, setStartPoint, and setEndPoint.
     setBallPosition(newStartPoint); // Set ball position to new start point.
-    setStartPoint(newStartPoint);
-    setEndPoint(newEndPoint);
+    setStartPoint(newStartPoint); // Set start point to new start point.
+    setEndPoint(newEndPoint); // Set end point to new end point.
     setStartTime(Date.now()); // Reset start time.
     setSpeedMultiplier(initialSpeedMultiplier); // Reset speed multiplier.
     setIsPaused(false); // Unpause the game.
@@ -248,6 +265,7 @@ const Game = ({ navigation, route }) => {
     setIsPaused(false);
   };
 
+  // Return the game screen with maze, ball, start point, end point, and pause button.
   return (
     <View style={styles.container}>
       <Svg height={height} width={width}>
@@ -276,11 +294,14 @@ const Game = ({ navigation, route }) => {
         />
         <Circle cx={endPoint.x} cy={endPoint.y} r={ballRadius} fill="red" />
       </Svg>
+      // Add pause button to the pauseButtonContainer.
       {/* <Button title="Pause" onPress={handlePause} /> */}
       <View style={styles.pauseButtonContainer}>
         <Button title="Pause" onPress={handlePause} />
       </View>
+      // Display time taken if game is completed.
       {timeTaken !== null && (
+        // Display time taken in seconds with 2 decimal places.
         <Text style={styles.timeText}>
           Time Taken: {timeTaken.toFixed(2)} seconds
         </Text>

@@ -1,4 +1,3 @@
-// import { StyleSheet } from "react-native"; // Import React Native components.
 import { NavigationContainer } from "@react-navigation/native"; // Import navigation container.
 import { createStackNavigator } from "@react-navigation/stack"; // Import stack navigator for screen navigation.
 import Game from "./components/Game";
@@ -10,6 +9,7 @@ const Stack = createStackNavigator();
 
 // Main App component with navigation.
 const App = () => (
+  // Navigation container with stack navigator.
   <NavigationContainer>
     <Stack.Navigator initialRouteName="Welcome">
       <Stack.Screen
