@@ -135,7 +135,7 @@ const Game = ({ navigation, route }) => {
   };
 
   return (
-    <View style={container}>
+    <View style={styles.container}>
       <Svg height={height} width={width}>
         {/* {maze.map((wall, index) => ( */}
         {fixedMaze.map((wall, index) => (
@@ -164,7 +164,9 @@ const Game = ({ navigation, route }) => {
       </Svg>
       <Button title="Pause" onPress={handlePause} />
       {timeTaken !== null && (
-        <Text style={timeText}>Time Taken: {timeTaken.toFixed(2)} seconds</Text>
+        <Text style={styles.timeText}>
+          Time Taken: {timeTaken.toFixed(2)} seconds
+        </Text>
       )}
     </View>
   );
