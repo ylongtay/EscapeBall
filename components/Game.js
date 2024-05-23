@@ -237,12 +237,12 @@ const Game = ({ navigation, route }) => {
 
   // Function to handle game pause.
   const handlePause = () => {
-    console.log("Pause button pressed, isPaused state:", isPaused);
     // Pause the game and navigate to the game menu screen.
+    console.log("Pause button pressed, isPaused state before set:", isPaused);
     setIsPaused(true);
-    console.log("Pause button pressed, isPaused state:", isPaused);
     // navigation.navigate("GameMenu", { timeTaken });
     setTimeout(() => navigation.navigate("GameMenu", { timeTaken }), 0);
+    console.log("Pause button pressed, isPaused state after set:", isPaused);
   };
 
   // Function to handle game restart.
@@ -268,10 +268,10 @@ const Game = ({ navigation, route }) => {
 
   // Function to handle game unpause.
   const handleUnpause = () => {
-    console.log("Resume button pressed, isPaused state:", isPaused);
+    console.log("Resume button pressed, isPaused state before set:", isPaused);
     // Unpause the game.
     setIsPaused(false);
-    console.log("Resume button pressed, isPaused state:", isPaused);
+    console.log("Resume button pressed, isPaused state after set:", isPaused);
   };
 
   // Return the game screen with maze, ball, start point, end point, and pause button.
