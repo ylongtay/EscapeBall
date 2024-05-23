@@ -19,6 +19,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: "red",
   },
+  pauseButtonContainer: {
+    position: "absolute",
+    bottom: 30,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
 });
 
 export default styles;
