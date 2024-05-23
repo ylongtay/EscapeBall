@@ -251,8 +251,8 @@ const Game = ({ navigation, route }) => {
   }, [isPaused, speedMultiplier]); // Remove maze.
 
   useEffect(() => {
-    console.log("isPaused state updated:", isPaused);
-    console.log("Time taken:", timeTaken, "seconds");
+    // console.log("isPaused state updated:", isPaused);
+    // console.log("Time taken:", timeTaken, "seconds");
     // if (isPaused) {
     if (isPaused && timeTaken !== null) {
       // navigation.navigate("GameMenu", { timeTaken, gameCompleted });
@@ -269,10 +269,10 @@ const Game = ({ navigation, route }) => {
     const timeElapsed = (Date.now() - startTime) / 1000; // Calculate time taken.
     setTimeTaken(timeElapsed); // Set time taken state.
     // Pause the game and navigate to the game menu screen.
-    console.log("Pause button pressed, isPaused state before set:", isPaused);
+    // console.log("Pause button pressed, isPaused state before set:", isPaused);
     setIsPaused(true);
     // console.log("Pause button pressed, isPaused state after set:", isPaused);
-    console.log("Pause button pressed, isPaused state after set:", true);
+    // console.log("Pause button pressed, isPaused state after set:", true);
   };
 
   // Function to handle game restart.
@@ -299,7 +299,7 @@ const Game = ({ navigation, route }) => {
 
   // Function to handle game unpause.
   const handleUnpause = () => {
-    console.log("Resume button pressed, isPaused state before set:", isPaused);
+    // console.log("Resume button pressed, isPaused state before set:", isPaused);
     // Unpause the game.
     setIsPaused(false);
     // if (!gameCompleted) {
@@ -307,7 +307,7 @@ const Game = ({ navigation, route }) => {
     //   setIsPaused(false);
     // }
     // console.log("Resume button pressed, isPaused state after set:", isPaused);
-    console.log("Resume button pressed, isPaused state after set:", false);
+    // console.log("Resume button pressed, isPaused state after set:", false);
   };
 
   // Return the game screen with maze, ball, start point, end point, and pause button.
