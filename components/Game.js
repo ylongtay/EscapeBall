@@ -294,12 +294,10 @@ const Game = ({ navigation, route }) => {
         />
         <Circle cx={endPoint.x} cy={endPoint.y} r={ballRadius} fill="red" />
       </Svg>
-      // Add pause button to the pauseButtonContainer.
       {/* <Button title="Pause" onPress={handlePause} /> */}
       <View style={styles.pauseButtonContainer}>
         <Button title="Pause" onPress={handlePause} />
       </View>
-      // Display time taken if game is completed.
       {timeTaken !== null && (
         // Display time taken in seconds with 2 decimal places.
         <Text style={styles.timeText}>
