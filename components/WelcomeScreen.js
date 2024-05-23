@@ -1,6 +1,6 @@
 import { View, Button, Text } from "react-native"; // Import React Native components.
 
-import "../App.css";
+import "./styles.css";
 
 // WelcomeScreen component for the initial screen.
 const WelcomeScreen = ({ navigation }) => (

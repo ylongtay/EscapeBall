@@ -1,6 +1,6 @@
 import { View, Button, Text } from "react-native"; // Import React Native components.
 
-import "../App.css";
+import "./styles.css";
 
 // GameMenu component for displaying after game ends or pauses.
 const GameMenu = ({ route, navigation }) => {
