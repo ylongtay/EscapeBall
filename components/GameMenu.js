@@ -9,6 +9,10 @@ const GameMenu = ({ route, navigation }) => {
   return (
     <View style={styles.centeredContainer}>
       <Button
+        title="Resume"
+        onPress={() => navigation.navigate("Game", { restart: false })}
+      />
+      <Button
         title="Restart Game"
         onPress={() => navigation.navigate("Game", { restart: true })}
       />

@@ -123,9 +123,15 @@ const Game = ({ navigation, route }) => {
 
   // Effect to handle restart game logic.
   useEffect(() => {
+    // Check if the game should be restarted.
     if (route.params?.restart) {
+      // If so, restart the game.
       handleRestart();
+      // Reset the restart parameter in navigation params.
       navigation.setParams({ restart: false });
+    } else {
+      // If not, unpause the game.
+      handleUnpause();
     }
   }, [route.params?.restart]);
 
@@ -210,12 +216,14 @@ const Game = ({ navigation, route }) => {
 
   // Function to handle game pause.
   const handlePause = () => {
+    // Pause the game and navigate to the game menu screen.
     setIsPaused(true);
     setTimeout(() => navigation.navigate("GameMenu", { timeTaken }), 0);
   };
 
   // Function to handle game restart.
   const handleRestart = () => {
+    // Reset the game state.
     // Comment out when random maze not used.
     // const newMaze = generateMaze();
     // const newStartPoint = getRandomPoint(newMaze);
@@ -224,6 +232,7 @@ const Game = ({ navigation, route }) => {
     const newEndPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new end point.
 
     // setMaze(newMaze);
+    // Remove maze prop from setBallPosition, setStartPoint, and setEndPoint.
     setBallPosition(newStartPoint); // Set ball position to new start point.
     setStartPoint(newStartPoint);
     setEndPoint(newEndPoint);
@@ -231,6 +240,12 @@ const Game = ({ navigation, route }) => {
     setSpeedMultiplier(initialSpeedMultiplier); // Reset speed multiplier.
     setIsPaused(false); // Unpause the game.
     setTimeTaken(null); // Reset time taken.
+  };
+
+  // Function to handle game unpause.
+  const handleUnpause = () => {
+    // Unpause the game.
+    setIsPaused(false);
   };
 
   return (
