@@ -1,8 +1,7 @@
 // Styles for the components.
 import { StyleSheet } from "react-native";
 
-// const styles = StyleSheet.create({
-export default StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -21,3 +20,5 @@ export default StyleSheet.create({
     color: "red",
   },
 });
+
+export default styles;
