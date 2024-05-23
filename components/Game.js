@@ -205,14 +205,15 @@ const Game = ({ navigation, route }) => {
             newY - ballRadius < endPoint.y + 20
           ) {
             // If end point reached, pause the game and navigate to the game menu screen.
-            setIsPaused(true); // Pause the game.
+            // setIsPaused(true); // Pause the game.
             const timeElapsed = (Date.now() - startTime) / 1000; // Calculate time taken.
             setTimeTaken(timeElapsed); // Set time taken state.
-            setTimeout(
-              // Navigate to the game menu screen after 0ms.
-              () => navigation.navigate("GameMenu", { timeTaken: timeElapsed }),
-              0
-            );
+            // setTimeout(
+            // Navigate to the game menu screen after 0ms.
+            //   () => navigation.navigate("GameMenu", { timeTaken: timeElapsed }),
+            //   0
+            // );
+            setIsPaused(true); // Pause the game.
           }
 
           return { x: newX, y: newY }; // Update ball position state.
@@ -233,7 +234,13 @@ const Game = ({ navigation, route }) => {
 
   useEffect(() => {
     console.log("isPaused state updated:", isPaused);
-  }, [isPaused]);
+    console.log("Time taken:", timeTaken);
+    // if (isPaused) {
+    if (isPaused && timeTaken !== null) {
+      // navigation.navigate("GameMenu", { timeTaken });
+      setTimeout(() => navigation.navigate("GameMenu", { timeTaken }), 0);
+    }
+  }, [isPaused, timeTaken]);
 
   // Function to handle game pause.
   const handlePause = () => {
@@ -243,8 +250,6 @@ const Game = ({ navigation, route }) => {
     // Pause the game and navigate to the game menu screen.
     console.log("Pause button pressed, isPaused state before set:", isPaused);
     setIsPaused(true);
-    // navigation.navigate("GameMenu", { timeTaken });
-    setTimeout(() => navigation.navigate("GameMenu", { timeTaken }), 0);
     console.log("Pause button pressed, isPaused state after set:", isPaused);
   };
 
