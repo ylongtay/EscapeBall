@@ -127,6 +127,7 @@ const Game = ({ navigation, route }) => {
   // Remove generateMaze() function in getRandomPoint
   const [endPoint, setEndPoint] = useState(getRandomPoint()); // End point of the ball.
   const [timeTaken, setTimeTaken] = useState(null); // State to track time taken to complete the maze.
+  const [gameCompleted, setGameCompleted] = useState(false); // State to track if the game is completed.
 
   // Effect to handle restart game logic.
   // useEffect(() => {
@@ -230,6 +231,7 @@ const Game = ({ navigation, route }) => {
             //   0
             // );
             setIsPaused(true); // Pause the game.
+            setGameCompleted(true); // Mark game as completed.
           }
 
           return { x: newX, y: newY }; // Update ball position state.
@@ -253,8 +255,11 @@ const Game = ({ navigation, route }) => {
     console.log("Time taken:", timeTaken, "seconds");
     // if (isPaused) {
     if (isPaused && timeTaken !== null) {
-      // navigation.navigate("GameMenu", { timeTaken });
-      setTimeout(() => navigation.navigate("GameMenu", { timeTaken }), 0);
+      // navigation.navigate("GameMenu", { timeTaken, gameCompleted });
+      setTimeout(
+        () => navigation.navigate("GameMenu", { timeTaken, gameCompleted }),
+        0
+      );
     }
   }, [isPaused, timeTaken]);
 
@@ -289,6 +294,7 @@ const Game = ({ navigation, route }) => {
     setSpeedMultiplier(initialSpeedMultiplier); // Reset speed multiplier.
     setIsPaused(false); // Unpause the game.
     setTimeTaken(null); // Reset time taken.
+    setGameCompleted(false); // Reset game completed state.
   };
 
   // Function to handle game unpause.
@@ -296,6 +302,10 @@ const Game = ({ navigation, route }) => {
     console.log("Resume button pressed, isPaused state before set:", isPaused);
     // Unpause the game.
     setIsPaused(false);
+    // if (!gameCompleted) {
+    // Unpause the game only if not completed.
+    //   setIsPaused(false);
+    // }
     // console.log("Resume button pressed, isPaused state after set:", isPaused);
     console.log("Resume button pressed, isPaused state after set:", false);
   };
@@ -332,6 +342,11 @@ const Game = ({ navigation, route }) => {
       <View style={styles.pauseButtonContainer}>
         <Button title="Pause" onPress={handlePause} />
       </View>
+      {/* {!gameCompleted && (
+        <View style={styles.pauseButtonContainer}>
+          <Button title="Pause" onPress={handlePause} />
+        </View>
+      )} */}
       {timeTaken !== null && (
         // Display time taken in seconds with 2 decimal places.
         <Text style={styles.timeText}>
