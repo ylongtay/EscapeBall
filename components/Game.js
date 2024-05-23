@@ -231,10 +231,17 @@ const Game = ({ navigation, route }) => {
     // Remove maze prop from useEffect dependency array.
   }, [isPaused, speedMultiplier]); // Remove maze.
 
+  useEffect(() => {
+    console.log("isPaused state updated:", isPaused);
+  }, [isPaused]);
+
   // Function to handle game pause.
   const handlePause = () => {
+    console.log("Pause button pressed, isPaused state:", isPaused);
     // Pause the game and navigate to the game menu screen.
     setIsPaused(true);
+    console.log("Pause button pressed, isPaused state:", isPaused);
+    // navigation.navigate("GameMenu", { timeTaken });
     setTimeout(() => navigation.navigate("GameMenu", { timeTaken }), 0);
   };
 
@@ -261,8 +268,10 @@ const Game = ({ navigation, route }) => {
 
   // Function to handle game unpause.
   const handleUnpause = () => {
+    console.log("Resume button pressed, isPaused state:", isPaused);
     // Unpause the game.
     setIsPaused(false);
+    console.log("Resume button pressed, isPaused state:", isPaused);
   };
 
   // Return the game screen with maze, ball, start point, end point, and pause button.
@@ -294,7 +303,6 @@ const Game = ({ navigation, route }) => {
         />
         <Circle cx={endPoint.x} cy={endPoint.y} r={ballRadius} fill="red" />
       </Svg>
-      {/* <Button title="Pause" onPress={handlePause} /> */}
       <View style={styles.pauseButtonContainer}>
         <Button title="Pause" onPress={handlePause} />
       </View>
