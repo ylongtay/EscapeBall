@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"; // Import necessary hooks from React.
 import { Button, Dimensions, Platform, Text, View } from "react-native"; // Import React Native components.
+import { useFocusEffect } from "@react-navigation/native"; // Import useFocusEffect from react-navigation.
 import { Accelerometer } from "expo-sensors"; // Import Accelerometer from expo-sensors to handle accelerometer data.
 import Svg, { Circle, Rect } from "react-native-svg"; // Import Svg and its sub-components for drawing shapes.
 
@@ -128,18 +129,33 @@ const Game = ({ navigation, route }) => {
   const [timeTaken, setTimeTaken] = useState(null); // State to track time taken to complete the maze.
 
   // Effect to handle restart game logic.
-  useEffect(() => {
-    // Check if the game should be restarted.
-    if (route.params?.restart) {
-      // If so, restart the game.
-      handleRestart();
-      // Reset the restart parameter in navigation params.
-      navigation.setParams({ restart: false });
-    } else {
-      // If not, unpause the game.
-      handleUnpause();
-    }
-  }, [route.params?.restart]);
+  // useEffect(() => {
+  // Check if the game should be restarted.
+  //   if (route.params?.restart) {
+  // If so, restart the game.
+  //     handleRestart();
+  // Reset the restart parameter in navigation params.
+  //     navigation.setParams({ restart: false });
+  //   } else {
+  // If not, unpause the game.
+  //     handleUnpause();
+  //   }
+  // }, [route.params?.restart]);
+  // Use useFocusEffect to handle screen focus and detect return from GameMenu.
+  useFocusEffect(
+    React.useCallback(() => {
+      // Check if the game should be restarted.
+      if (route.params?.restart) {
+        // If so, restart the game.
+        handleRestart();
+        // Reset the restart parameter in navigation params.
+        navigation.setParams({ restart: false });
+      } else {
+        // If not, unpause the game.
+        handleUnpause();
+      }
+    }, [route.params?.restart])
+  );
 
   // Effect to set the ball position to start point when the game starts.
   useEffect(() => {
