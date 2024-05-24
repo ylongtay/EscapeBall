@@ -13,12 +13,12 @@ const { width, height } = Dimensions.get("window");
 const ballRadius = 13;
 
 // Set fixed maze wall density factor, generation scale, height, width, and scale.
-const mazeWallDensityFactor = 0.3;
-const mazeWallGenerationScale = 0.9;
-const mazeWallHeight = 38;
-const mazeWallWidth = 38;
-const mazeWallScale = 38;
-const targetPointSizeReduction = 40;
+const mazeWallDensityFactor = 0.3; // Adjust the density factor to change the number of walls.
+const mazeWallGenerationScale = 0.9; // Adjust the generation scale to change the maze size.
+const mazeWallHeight = 30; // Adjust the height of the maze walls.
+const mazeWallWidth = 30; // Adjust the width of the maze walls.
+const mazeWallScale = 30; // Adjust the scale of the maze walls.
+const targetPointSizeReduction = 40; // Adjust the target point size reduction.
 
 // Define fixed walls for the maze as an array of objects.
 // const fixedMaze = [
