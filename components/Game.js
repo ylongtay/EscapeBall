@@ -56,6 +56,15 @@ const coordsToIndex = (x, y, cellSize) => {
 //   return { x: col * cellSize, y: row * cellSize };
 // };
 
+// Utility function to calculate distance between two points.
+const calculateDistance = (point1, point2) => {
+  // Calculate Euclidean distance between two points.
+  return Math.sqrt(
+    // Calculate the square of the sum of the squares of the differences in x and y coordinates.
+    Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2)
+  );
+};
+
 // This function is used to generate a random maze.
 const generateMaze = () => {
   const maze = [];
@@ -515,17 +524,29 @@ const Game = ({ navigation, route }) => {
     // const newStartPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new start point.
     // const newEndPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new end point.
     // Generate new start point.
-    let newStartPoint = getRandomPoint();
+    // let newStartPoint = getRandomPoint();
 
     // Generate new end point.
-    let newEndPoint = getRandomPoint();
+    // let newEndPoint = getRandomPoint();
 
     // Ensure there is a valid path from start to end.
-    while (!checkValidPath(newStartPoint, newEndPoint, mazeWallScale)) {
-      // If there is no valid path, generate new start and end points.
-      newStartPoint = getRandomPoint();
-      newEndPoint = getRandomPoint();
-    }
+    // while (!checkValidPath(newStartPoint, newEndPoint, mazeWallScale)) {
+    // If there is no valid path, generate new start and end points.
+    //   newStartPoint = getRandomPoint();
+    //   newEndPoint = getRandomPoint();
+    // }
+
+    const minDistance = 200; // Set a minimum distance between start and end points.
+
+    // Ensure there is a valid path from start to end and they are sufficiently far apart.
+    do {
+      // Generate new start and end points.
+      newStartPoint = getRandomPoint(targetPointSizeReduction);
+      newEndPoint = getRandomPoint(targetPointSizeReduction);
+    } while (
+      !checkValidPath(newStartPoint, newEndPoint, mazeWallScale) || // Check if there is a valid path from start to end.
+      calculateDistance(newStartPoint, newEndPoint) < minDistance // Check if the distance between start and end points is sufficient.
+    );
 
     // setMaze(newMaze);
     // Remove maze prop from setBallPosition, setStartPoint, and setEndPoint.
