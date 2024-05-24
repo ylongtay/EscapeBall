@@ -31,4 +31,5 @@ const App = () => (
   </NavigationContainer>
 );
 
+// Export the App component.
 export default App;

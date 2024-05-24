@@ -237,8 +237,20 @@ const Game = ({ navigation, route }) => {
   //     handleUnpause();
   //   }
   // }, [route.params?.restart]);
+
   // Use useFocusEffect to handle screen focus and detect return from GameMenu.
+  // The useEffect is tied to component renders and dependency changes but doesn't handle focus changes natively.
+  // The useFocusEffect ensures that the effect runs every time the screen gains focus, making it more reliable in navigation contexts.
+  // By using useFocusEffect, you ensure that your effect runs every time GameMenu comes into focus,
+  // thereby updating the boolean state correctly regardless of the navigation sequence.
+  // Given the current scenario, we update the isPaused boolean value in the GameMenu component then navigate to the Game component.
+  // If the Game component relies on navigation parameters and useEffect, it might not update correctly on subsequent navigation jumps because
+  // useEffect doesn't inherently handle focus changes. With useFocusEffect, every time the Game component comes into focus, it re-runs the effect,
+  // ensuring that any state or navigation parameter changes are handled correctly.
+  // Here, the implementation using useFocusEffect to ensure the boolean state isPaused updates correctly every time you navigate between the
+  // Game and GameMenu components.
   useFocusEffect(
+    // Callback function to handle screen focus.
     React.useCallback(() => {
       // Check if the game should be restarted.
       if (route.params?.restart) {
@@ -285,7 +297,7 @@ const Game = ({ navigation, route }) => {
           let newX = prevPosition.x + adjustedX * speedMultiplier * 0.02;
           let newY = prevPosition.y - adjustedY * speedMultiplier * 0.02;
 
-          // Ensure the ball stays within screen bounds.
+          // Check to ensure that the ball stays within screen bounds.
           if (newX + ballRadius > width) newX = width - ballRadius;
           if (newX - ballRadius < 0) newX = ballRadius;
           if (newY + ballRadius > height) newY = height - ballRadius;
@@ -293,8 +305,14 @@ const Game = ({ navigation, route }) => {
 
           // Function to check for collision at a given point.
           const isCollision = (x, y) => {
+            // Check if the ball collides with a wall.
+            // The array.some(function(value, index, arr), this) method checks if any array elements pass a test (provided as a callback function).
+            // It executes the callback function once for each array element. It returns true (and stops) if the function returns true
+            // for one of the array elements and returns false if the function returns false for all of the array elements.
+            // It does not execute the function for empty array elements and does not change the original array.
             return fixedMaze.some(
               (wall) =>
+                // Check if the ball collides with a wall.
                 x + ballRadius > wall.x &&
                 x - ballRadius < wall.x + wall.width &&
                 y + ballRadius > wall.y &&
@@ -303,7 +321,7 @@ const Game = ({ navigation, route }) => {
           };
 
           // Check for collisions with maze walls.
-          let collisionDetected = false;
+          // let collisionDetected = false;
 
           // //   for (let wall of maze) {
           // for (let wall of fixedMaze) {
@@ -360,26 +378,34 @@ const Game = ({ navigation, route }) => {
 
           // Check for horizontal collisions.
           if (isCollision(newX, prevPosition.y)) {
-            collisionDetected = true;
+            // collisionDetected = true;
+            // If collision detected, reset position to previous position.
             newX = prevPosition.x;
           }
 
           // Check for vertical collisions.
           if (isCollision(prevPosition.x, newY)) {
-            collisionDetected = true;
+            // collisionDetected = true;
+            // If collision detected, reset position to previous position.
             newY = prevPosition.y;
           }
 
           // Check for diagonal collisions by stepping through smaller increments.
           const steps = 10;
+
+          // Calculate the change in x and y for each step.
           const deltaX = (newX - prevPosition.x) / steps;
           const deltaY = (newY - prevPosition.y) / steps;
 
+          // Check for collisions at each intermediate step.
           for (let i = 1; i <= steps; i++) {
+            // Calculate the intermediate position.
             const intermediateX = prevPosition.x + deltaX * i;
             const intermediateY = prevPosition.y + deltaY * i;
 
+            // Check for collision at the intermediate position.
             if (isCollision(intermediateX, intermediateY)) {
+              // If collision detected, reset position to previous position.
               newX = prevPosition.x;
               newY = prevPosition.y;
               break;
@@ -415,6 +441,7 @@ const Game = ({ navigation, route }) => {
     return () => {
       // Unsubscribe from accelerometer data.
       subscription.remove();
+
       // Clear interval for speed multiplier update.
       clearInterval(intervalId);
     };
@@ -422,12 +449,15 @@ const Game = ({ navigation, route }) => {
     // Remove maze prop from useEffect dependency array.
   }, [isPaused, speedMultiplier]); // Remove maze.
 
+  // Effect to handle game pause and navigation to game menu screen.
   useEffect(() => {
     // console.log("isPaused state updated:", isPaused);
     // console.log("Time taken:", timeTaken, "seconds");
     // if (isPaused) {
     if (isPaused && timeTaken !== null) {
+      // Check if game is paused and time taken is not null.
       // navigation.navigate("GameMenu", { timeTaken, gameCompleted });
+      // Navigate to the game menu screen after 0ms.
       setTimeout(
         () => navigation.navigate("GameMenu", { timeTaken, gameCompleted }),
         0
@@ -442,6 +472,7 @@ const Game = ({ navigation, route }) => {
     setTimeTaken(timeElapsed); // Set time taken state.
     // Pause the game and navigate to the game menu screen.
     // console.log("Pause button pressed, isPaused state before set:", isPaused);
+    // Pause the game.
     setIsPaused(true);
     // console.log("Pause button pressed, isPaused state after set:", isPaused);
     // console.log("Pause button pressed, isPaused state after set:", true);
@@ -494,7 +525,7 @@ const Game = ({ navigation, route }) => {
     // console.log("Resume button pressed, isPaused state after set:", false);
   };
 
-  // Return the game screen with maze, ball, start point, end point, and pause button.
+  // Return the game screen with maze, ball, start point, end point, and pause button. Display time taken if available.
   return (
     <View style={styles.container}>
       <Svg height={height} width={width}>
@@ -531,7 +562,7 @@ const Game = ({ navigation, route }) => {
           <Button title="Pause" onPress={handlePause} />
         </View>
       )} */}
-      {timeTaken !== null && (
+      {timeTaken !== null && ( // Display time taken if available.
         // Display time taken in seconds with 2 decimal places.
         <Text style={styles.timeText}>
           Time Taken: {timeTaken.toFixed(2)} seconds
@@ -541,4 +572,5 @@ const Game = ({ navigation, route }) => {
   );
 };
 
+// Export the Game component.
 export default Game;

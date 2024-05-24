@@ -11,4 +11,5 @@ const WelcomeScreen = ({ navigation }) => (
   </View>
 );
 
+// Export the WelcomeScreen component.
 export default WelcomeScreen;

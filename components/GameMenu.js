@@ -9,9 +9,12 @@ const GameMenu = ({ route, navigation }) => {
   // Get time taken and gameCompleted from navigation params.
   const { timeTaken, gameCompleted } = route.params || {};
 
+  // Use the useFocusEffect hook to handle back button press.
   useFocusEffect(
+    // Callback function to handle back button press.
     React.useCallback(() => {
       const onBackPress = () => {
+        // Check if the game is completed.
         if (!gameCompleted) {
           // If the game is not completed, resume the game.
           navigation.navigate("Game", { restart: false });
@@ -19,22 +22,27 @@ const GameMenu = ({ route, navigation }) => {
           // If the game is completed, navigate to the main menu.
           navigation.navigate("Welcome");
         }
+
+        // Return true to prevent default back button behavior.
         return true;
       };
 
+      // Add event listener for hardware back press.
       const subscription = BackHandler.addEventListener(
-        "hardwareBackPress",
-        onBackPress
+        "hardwareBackPress", // Event name for hardware back press.
+        onBackPress // Callback function for hardware back press.
       );
 
+      // Return a cleanup function to remove the event listener.
       return () => subscription.remove();
     }, [navigation, gameCompleted])
   );
 
   // Return the GameMenu component.
   return (
+    // View component to display game menu options.
     <View style={styles.centeredContainer}>
-      {!gameCompleted && (
+      {!gameCompleted && ( // Display the game completed message if the game is completed.
         <Button
           title="Resume"
           onPress={() => navigation.navigate("Game", { restart: false })}
@@ -58,4 +66,5 @@ const GameMenu = ({ route, navigation }) => {
   );
 };
 
+// Export the GameMenu component.
 export default GameMenu;
