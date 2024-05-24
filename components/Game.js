@@ -196,59 +196,99 @@ const Game = ({ navigation, route }) => {
           if (newY + ballRadius > height) newY = height - ballRadius;
           if (newY - ballRadius < 0) newY = ballRadius;
 
+          // Function to check for collision at a given point.
+          const isCollision = (x, y) => {
+            return fixedMaze.some(
+              (wall) =>
+                x + ballRadius > wall.x &&
+                x - ballRadius < wall.x + wall.width &&
+                y + ballRadius > wall.y &&
+                y - ballRadius < wall.y + wall.height
+            );
+          };
+
           // Check for collisions with maze walls.
           let collisionDetected = false;
-          //   for (let wall of maze) {
-          for (let wall of fixedMaze) {
-            //Change maze to fixedMaze.
-            // Check if the ball collides with a wall.
-            if (
-              newX + ballRadius > wall.x &&
-              newX - ballRadius < wall.x + wall.width &&
-              newY + ballRadius > wall.y &&
-              newY - ballRadius < wall.y + wall.height
-            ) {
-              // // If collision detected, reset position to previous position.
-              // newX = prevPosition.x;
-              // newY = prevPosition.y;
-              // break;
-              // Calculate the distances to the wall edges.
-              // Calculate the distances to the wall edges.
-              const distToLeft = Math.abs(newX + ballRadius - wall.x);
-              const distToRight = Math.abs(
-                newX - ballRadius - (wall.x + wall.width)
-              );
-              const distToTop = Math.abs(newY + ballRadius - wall.y);
-              const distToBottom = Math.abs(
-                newY - ballRadius - (wall.y + wall.height)
-              );
 
-              // Find the minimum distance to determine the collision side.
-              const minDist = Math.min(
-                distToLeft,
-                distToRight,
-                distToTop,
-                distToBottom
-              );
+          // //   for (let wall of maze) {
+          // for (let wall of fixedMaze) {
+          //   //Change maze to fixedMaze.
+          //   // Check if the ball collides with a wall.
+          //   if (
+          //     newX + ballRadius > wall.x &&
+          //     newX - ballRadius < wall.x + wall.width &&
+          //     newY + ballRadius > wall.y &&
+          //     newY - ballRadius < wall.y + wall.height
+          //   ) {
+          //     // // If collision detected, reset position to previous position.
+          //     // newX = prevPosition.x;
+          //     // newY = prevPosition.y;
+          //     // break;
+          //     // Calculate the distances to the wall edges.
+          //     // Calculate the distances to the wall edges.
+          //     const distToLeft = Math.abs(newX + ballRadius - wall.x);
+          //     const distToRight = Math.abs(
+          //       newX - ballRadius - (wall.x + wall.width)
+          //     );
+          //     const distToTop = Math.abs(newY + ballRadius - wall.y);
+          //     const distToBottom = Math.abs(
+          //       newY - ballRadius - (wall.y + wall.height)
+          //     );
 
-              // Adjust the ball position based on the collision side.
-              if (minDist === distToLeft) {
-                newX = wall.x - ballRadius;
-              } else if (minDist === distToRight) {
-                newX = wall.x + wall.width + ballRadius;
-              } else if (minDist === distToTop) {
-                newY = wall.y - ballRadius;
-              } else if (minDist === distToBottom) {
-                newY = wall.y + wall.height + ballRadius;
-              }
-              collisionDetected = true;
-              break;
-            }
+          //     // Find the minimum distance to determine the collision side.
+          //     const minDist = Math.min(
+          //       distToLeft,
+          //       distToRight,
+          //       distToTop,
+          //       distToBottom
+          //     );
+
+          //     // Adjust the ball position based on the collision side.
+          //     if (minDist === distToLeft) {
+          //       newX = wall.x - ballRadius;
+          //     } else if (minDist === distToRight) {
+          //       newX = wall.x + wall.width + ballRadius;
+          //     } else if (minDist === distToTop) {
+          //       newY = wall.y - ballRadius;
+          //     } else if (minDist === distToBottom) {
+          //       newY = wall.y + wall.height + ballRadius;
+          //     }
+          //     collisionDetected = true;
+          //     break;
+          //   }
+          // }
+
+          // // If no collision, update the ball position.
+          // if (!collisionDetected) {
+          //   prevPosition = { x: newX, y: newY };
+          // }
+
+          // Check for horizontal collisions.
+          if (isCollision(newX, prevPosition.y)) {
+            collisionDetected = true;
+            newX = prevPosition.x;
           }
 
-          // If no collision, update the ball position.
-          if (!collisionDetected) {
-            prevPosition = { x: newX, y: newY };
+          // Check for vertical collisions.
+          if (isCollision(prevPosition.x, newY)) {
+            collisionDetected = true;
+            newY = prevPosition.y;
+          }
+
+          // Check for diagonal collisions by stepping through smaller increments.
+          const steps = 10;
+          const deltaX = (newX - prevPosition.x) / steps;
+          const deltaY = (newY - prevPosition.y) / steps;
+
+          for (let i = 1; i <= steps; i++) {
+            const intermediateX = prevPosition.x + deltaX * i;
+            const intermediateY = prevPosition.y + deltaY * i;
+
+            if (isCollision(intermediateX, intermediateY)) {
+              newX = prevPosition.x;
+              newY = prevPosition.y;
+              break;
+            }
           }
 
           // Check if ball has reached the end point.
