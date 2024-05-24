@@ -197,6 +197,7 @@ const Game = ({ navigation, route }) => {
           if (newY - ballRadius < 0) newY = ballRadius;
 
           // Check for collisions with maze walls.
+          let collisionDetected = false;
           //   for (let wall of maze) {
           for (let wall of fixedMaze) {
             //Change maze to fixedMaze.
@@ -211,6 +212,7 @@ const Game = ({ navigation, route }) => {
               // newX = prevPosition.x;
               // newY = prevPosition.y;
               // break;
+              // Calculate the distances to the wall edges.
               // Calculate the distances to the wall edges.
               const distToLeft = Math.abs(newX + ballRadius - wall.x);
               const distToRight = Math.abs(
@@ -239,8 +241,14 @@ const Game = ({ navigation, route }) => {
               } else if (minDist === distToBottom) {
                 newY = wall.y + wall.height + ballRadius;
               }
+              collisionDetected = true;
               break;
             }
+          }
+
+          // If no collision, update the ball position.
+          if (!collisionDetected) {
+            prevPosition = { x: newX, y: newY };
           }
 
           // Check if ball has reached the end point.
