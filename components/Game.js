@@ -207,9 +207,38 @@ const Game = ({ navigation, route }) => {
               newY + ballRadius > wall.y &&
               newY - ballRadius < wall.y + wall.height
             ) {
-              // If collision detected, reset position to previous position.
-              newX = prevPosition.x;
-              newY = prevPosition.y;
+              // // If collision detected, reset position to previous position.
+              // newX = prevPosition.x;
+              // newY = prevPosition.y;
+              // break;
+              // Calculate the distances to the wall edges.
+              const distToLeft = Math.abs(newX + ballRadius - wall.x);
+              const distToRight = Math.abs(
+                newX - ballRadius - (wall.x + wall.width)
+              );
+              const distToTop = Math.abs(newY + ballRadius - wall.y);
+              const distToBottom = Math.abs(
+                newY - ballRadius - (wall.y + wall.height)
+              );
+
+              // Find the minimum distance to determine the collision side.
+              const minDist = Math.min(
+                distToLeft,
+                distToRight,
+                distToTop,
+                distToBottom
+              );
+
+              // Adjust the ball position based on the collision side.
+              if (minDist === distToLeft) {
+                newX = wall.x - ballRadius;
+              } else if (minDist === distToRight) {
+                newX = wall.x + wall.width + ballRadius;
+              } else if (minDist === distToTop) {
+                newY = wall.y - ballRadius;
+              } else if (minDist === distToBottom) {
+                newY = wall.y + wall.height + ballRadius;
+              }
               break;
             }
           }
