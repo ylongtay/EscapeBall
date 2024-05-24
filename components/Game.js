@@ -52,9 +52,9 @@ const coordsToIndex = (x, y, cellSize) => {
 };
 
 // Utility function to convert grid index to coordinates.
-const indexToCoords = (col, row, cellSize) => {
-  return { x: col * cellSize, y: row * cellSize };
-};
+// const indexToCoords = (col, row, cellSize) => {
+//   return { x: col * cellSize, y: row * cellSize };
+// };
 
 // This function is used to generate a random maze.
 const generateMaze = () => {
@@ -144,6 +144,33 @@ const checkValidPath = (start, end, cellSize) => {
   const numRows = Math.floor((height / cellSize) * mazeWallGenerationScale);
   const startIdx = coordsToIndex(start.x, start.y, cellSize);
   const endIdx = coordsToIndex(end.x, end.y, cellSize);
+
+  // Ensure that startIdx and endIdx are within bounds.
+  if (
+    startIdx.col < 0 ||
+    startIdx.col >= numCols ||
+    startIdx.row < 0 ||
+    startIdx.row >= numRows
+  ) {
+    // If startIdx is out of bounds, return false.
+    // throw new Error("startIdx is out of bounds");
+    // console.error("startIdx is out of bounds", startIdx);
+
+    return false;
+  }
+
+  if (
+    endIdx.col < 0 ||
+    endIdx.col >= numCols ||
+    endIdx.row < 0 ||
+    endIdx.row >= numRows
+  ) {
+    // If endIdx is out of bounds, return false.
+    // throw new Error("endIdx is out of bounds");
+    // console.error("endIdx is out of bounds", endIdx);
+
+    return false;
+  }
 
   // Create a queue to store the indices of the cells to visit.
   const queue = [startIdx];
