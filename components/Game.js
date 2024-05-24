@@ -46,6 +46,16 @@ const targetPointSizeReduction = 40;
 //   { x: 150, y: 550, width: 10, height: 100 },
 // ];
 
+// Utility function to convert coordinates to grid index.
+const coordsToIndex = (x, y, cellSize) => {
+  return { col: Math.floor(x / cellSize), row: Math.floor(y / cellSize) };
+};
+
+// Utility function to convert grid index to coordinates.
+const indexToCoords = (col, row, cellSize) => {
+  return { x: col * cellSize, y: row * cellSize };
+};
+
 // This function is used to generate a random maze.
 const generateMaze = () => {
   const maze = [];
@@ -126,6 +136,71 @@ const getRandomPoint = () => {
 
   // Return the random point.
   return point;
+};
+
+// Function to check if there is a valid path between the start and end points using Breadth-First Search (BFS).
+const checkValidPath = (start, end, cellSize) => {
+  const numCols = Math.floor((width / cellSize) * mazeWallGenerationScale);
+  const numRows = Math.floor((height / cellSize) * mazeWallGenerationScale);
+  const startIdx = coordsToIndex(start.x, start.y, cellSize);
+  const endIdx = coordsToIndex(end.x, end.y, cellSize);
+
+  // Create a queue to store the indices of the cells to visit.
+  const queue = [startIdx];
+
+  // Create a visited array to keep track of visited cells.
+  const visited = Array.from(Array(numRows), () => Array(numCols).fill(false));
+  visited[startIdx.row][startIdx.col] = true;
+
+  // Define the directions to move in the maze.
+  const directions = [
+    { dx: -1, dy: 0 },
+    { dx: 1, dy: 0 },
+    { dx: 0, dy: -1 },
+    { dx: 0, dy: 1 },
+  ];
+
+  // Perform BFS to find a path from the start to end points.
+  while (queue.length > 0) {
+    // Get the current cell from the queue.
+    const { col, row } = queue.shift();
+
+    // Check if the current cell is the end point.
+    if (col === endIdx.col && row === endIdx.row) {
+      // If the end point is reached, return true.
+      return true;
+    }
+
+    // Check the neighboring cells.
+    for (const { dx, dy } of directions) {
+      // Calculate the new column and row for the neighboring cell.
+      const newCol = col + dx;
+      const newRow = row + dy;
+
+      // Check if the neighboring cell is within bounds and not visited.
+      if (
+        newCol >= 0 &&
+        newCol < numCols &&
+        newRow >= 0 &&
+        newRow < numRows &&
+        !visited[newRow][newCol] &&
+        !fixedMaze.some(
+          (wall) =>
+            newCol * cellSize + ballRadius > wall.x &&
+            newCol * cellSize - ballRadius < wall.x + wall.width &&
+            newRow * cellSize + ballRadius > wall.y &&
+            newRow * cellSize - ballRadius < wall.y + wall.height
+        )
+      ) {
+        // If the neighboring cell is valid, mark it as visited and add it to the queue.
+        visited[newRow][newCol] = true;
+        queue.push({ col: newCol, row: newRow });
+      }
+    }
+  }
+
+  // If no valid path is found, return false.
+  return false;
 };
 
 // Game component where the main game logic resides.
@@ -381,6 +456,13 @@ const Game = ({ navigation, route }) => {
     // const newEndPoint = getRandomPoint(newMaze);
     const newStartPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new start point.
     const newEndPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new end point.
+
+    // Ensure there is a valid path from start to end.
+    while (!checkValidPath(newStartPoint, newEndPoint, mazeWallScale)) {
+      // If there is no valid path, generate new start and end points.
+      const newStartPoint = getRandomPoint();
+      const newEndPoint = getRandomPoint();
+    }
 
     // setMaze(newMaze);
     // Remove maze prop from setBallPosition, setStartPoint, and setEndPoint.
