@@ -17,36 +17,51 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedUrl, setSelectedUrl] = useState("");
+  const [page, setPage] = useState(1);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   useEffect(() => {
-    const fetchHeadlines = async () => {
-      try {
-        const response = await axios.get(
-          "https://newsapi.org/v2/top-headlines",
-          {
-            params: {
-              sources: "techcrunch",
-              apiKey: "key",
-            },
-          }
-        );
-        setHeadlines(response.data.articles);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-      }
-    };
+    fetchHeadlines(page);
+  }, [page]);
 
-    fetchHeadlines();
-  }, []);
+  const fetchHeadlines = async (pageNumber) => {
+    try {
+      if (pageNumber === 1) {
+        setLoading(true);
+      } else {
+        setIsFetchingMore(true);
+      }
+      const response = await axios.get("https://newsapi.org/v2/top-headlines", {
+        params: {
+          sources: "techcrunch",
+          apiKey: "your_api_key_here",
+          page: pageNumber,
+          pageSize: 10, // You can adjust this value as needed
+        },
+      });
+      setHeadlines((prevHeadlines) => [
+        ...prevHeadlines,
+        ...response.data.articles,
+      ]);
+      setLoading(false);
+      setIsFetchingMore(false);
+    } catch (error) {
+      console.error(error);
+      setLoading(false);
+      setIsFetchingMore(false);
+    }
+  };
+
+  const loadMoreArticles = () => {
+    setPage((prevPage) => prevPage + 1);
+  };
 
   const openArticle = (url) => {
     setSelectedUrl(url);
     setModalVisible(true);
   };
 
-  if (loading) {
+  if (loading && page === 1) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -56,10 +71,6 @@ const App = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>EscapeBall</Text>
-      <Text style={styles.title}>
-        Principal Developer Yong Long's Tech News
-      </Text>
       <FlatList
         data={headlines}
         keyExtractor={(item) => item.url}
@@ -74,6 +85,17 @@ const App = () => {
             </View>
           </TouchableOpacity>
         )}
+        ListFooterComponent={
+          !loading && (
+            <View style={styles.footer}>
+              {isFetchingMore ? (
+                <ActivityIndicator size="small" color="#0000ff" />
+              ) : (
+                <Button title="Load More" onPress={loadMoreArticles} />
+              )}
+            </View>
+          )
+        }
       />
       <Modal
         visible={modalVisible}
@@ -133,6 +155,10 @@ const styles = StyleSheet.create({
   },
   webView: {
     flex: 1,
+  },
+  footer: {
+    padding: 10,
+    alignItems: "center",
   },
 });
 
