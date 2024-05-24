@@ -454,14 +454,19 @@ const Game = ({ navigation, route }) => {
     // const newMaze = generateMaze();
     // const newStartPoint = getRandomPoint(newMaze);
     // const newEndPoint = getRandomPoint(newMaze);
-    const newStartPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new start point.
-    const newEndPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new end point.
+    // const newStartPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new start point.
+    // const newEndPoint = getRandomPoint(); // Remove newMaze prop from getRandomPoint(). Generate new end point.
+    // Generate new start point.
+    let newStartPoint = getRandomPoint();
+
+    // Generate new end point.
+    let newEndPoint = getRandomPoint();
 
     // Ensure there is a valid path from start to end.
     while (!checkValidPath(newStartPoint, newEndPoint, mazeWallScale)) {
       // If there is no valid path, generate new start and end points.
-      const newStartPoint = getRandomPoint();
-      const newEndPoint = getRandomPoint();
+      newStartPoint = getRandomPoint();
+      newEndPoint = getRandomPoint();
     }
 
     // setMaze(newMaze);
