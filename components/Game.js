@@ -8,57 +8,76 @@ import styles from "../styles.js";
 
 // Get device screen dimensions.
 const { width, height } = Dimensions.get("window");
+
 // Set radius of the ball.
-const ballRadius = 15;
+const ballRadius = 13;
+
+// Set fixed maze wall density factor, generation scale, height, width, and scale.
+const mazeWallDensityFactor = 0.3;
+const mazeWallGenerationScale = 0.9;
+const mazeWallHeight = 38;
+const mazeWallWidth = 38;
+const mazeWallScale = 38;
+const targetPointSizeReduction = 40;
 
 // Define fixed walls for the maze as an array of objects.
-const fixedMaze = [
-  // Define fixed walls for the maze. Add more walls as needed.
-  // Horizontal walls.
-  { x: 0, y: 100, width: 80, height: 10 },
-  { x: 200, y: 100, width: 150, height: 10 },
-  { x: 50, y: 200, width: 100, height: 10 },
-  { x: 250, y: 200, width: 100, height: 10 },
-  { x: 100, y: 300, width: 150, height: 10 },
-  { x: 0, y: 400, width: 100, height: 10 },
-  { x: 200, y: 400, width: 150, height: 10 },
-  { x: 50, y: 500, width: 100, height: 10 },
-  { x: 250, y: 500, width: 100, height: 10 },
+// const fixedMaze = [
+//   // Define fixed walls for the maze. Add more walls as needed.
+//   // Horizontal walls.
+//   { x: 0, y: 100, width: 80, height: 10 },
+//   { x: 200, y: 100, width: 150, height: 10 },
+//   { x: 50, y: 200, width: 100, height: 10 },
+//   { x: 250, y: 200, width: 100, height: 10 },
+//   { x: 100, y: 300, width: 150, height: 10 },
+//   { x: 0, y: 400, width: 100, height: 10 },
+//   { x: 200, y: 400, width: 150, height: 10 },
+//   { x: 50, y: 500, width: 100, height: 10 },
+//   { x: 250, y: 500, width: 100, height: 10 },
 
-  // Vertical walls.
-  { x: 150, y: 0, width: 10, height: 150 },
-  { x: 150, y: 200, width: 10, height: 150 },
-  { x: 100, y: 150, width: 10, height: 100 },
-  { x: 250, y: 150, width: 10, height: 100 },
-  { x: 0, y: 300, width: 10, height: 100 },
-  { x: 300, y: 300, width: 10, height: 100 },
-  { x: 50, y: 450, width: 10, height: 100 },
-  { x: 200, y: 450, width: 10, height: 100 },
-  { x: 150, y: 550, width: 10, height: 100 },
-];
+//   // Vertical walls.
+//   { x: 150, y: 0, width: 10, height: 150 },
+//   { x: 150, y: 200, width: 10, height: 150 },
+//   { x: 100, y: 150, width: 10, height: 100 },
+//   { x: 250, y: 150, width: 10, height: 100 },
+//   { x: 0, y: 300, width: 10, height: 100 },
+//   { x: 300, y: 300, width: 10, height: 100 },
+//   { x: 50, y: 450, width: 10, height: 100 },
+//   { x: 200, y: 450, width: 10, height: 100 },
+//   { x: 150, y: 550, width: 10, height: 100 },
+// ];
 
 // This function is used to generate a random maze.
-// const generateMaze = () => {
-//   const maze = [];
-//   const cellSize = 40;
-//   const numCols = Math.floor(width / cellSize);
-//   const numRows = Math.floor(height / cellSize);
+const generateMaze = () => {
+  const maze = [];
+  // const cellSize = 40;
+  const cellSize = mazeWallScale;
+  const numCols = Math.floor((width / cellSize) * mazeWallGenerationScale);
+  const numRows = Math.floor((height / cellSize) * mazeWallGenerationScale);
 
-//   for (let i = 0; i < numRows; i++) {
-//     for (let j = 0; j < numCols; j++) {
-//       if (Math.random() < 0.3) {
-//         maze.push({
-//           x: j * cellSize,
-//           y: i * cellSize,
-//           width: cellSize,
-//           height: cellSize,
-//         });
-//       }
-//     }
-//   }
+  // Generate random walls for the maze. Adjust the density factor to change the number of walls.
+  // Adjust the random factor to change the randomness of the walls.
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      // if (Math.random() < 0.3) {
+      if (Math.random() < mazeWallDensityFactor) {
+        maze.push({
+          x: j * cellSize,
+          y: i * cellSize,
+          // width: cellSize,
+          // height: cellSize,
+          width: mazeWallWidth,
+          height: mazeWallHeight,
+        });
+      }
+    }
+  }
 
-//   return maze;
-// };
+  // Return the generated maze.
+  return maze;
+};
+
+// Generate a fixed maze for the game.
+fixedMaze = generateMaze();
 
 // Use for random maze valid path
 // const isValidPoint = (point, maze) => {
@@ -89,7 +108,8 @@ const isValidPoint = (point) => {
 const getRandomPoint = () => {
   // Remove maze prop for fixed maze.
   let point;
-  const cellSize = 40;
+  // const cellSize = 40;
+  const cellSize = targetPointSizeReduction;
 
   // Loop until a valid point is found.
   while (true) {
