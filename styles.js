@@ -10,14 +10,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  timeText: {
-    fontSize: 18,
-    marginTop: 20,
-    color: "red",
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent overlay.
   },
   pauseButtonContainer: {
     position: "absolute",
@@ -25,6 +22,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center",
+  },
+  timeText: {
+    fontSize: 18,
+    marginTop: 20,
+    color: "red",
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
   },
 });
 
