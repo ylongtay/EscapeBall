@@ -34,6 +34,11 @@ const GameMenu = ({ route, navigation }) => {
   // Return the GameMenu component.
   return (
     <View style={styles.centeredContainer}>
+      {gameCompleted && ( // Display the game completed message if the game is completed.
+        <Text style={styles.announcementMessage}>
+          You have completed the level!{" "}
+        </Text>
+      )}
       {!gameCompleted && (
         <Button
           title="Resume"

@@ -2,6 +2,10 @@
 import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
+  announcementMessage: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
   container: {
     flex: 1,
   },
