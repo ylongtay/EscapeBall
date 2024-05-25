@@ -71,6 +71,10 @@ const App = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Escape Ball</Text>
+      <Text style={styles.title}>
+        Principal Developer Yong Long's Tech News
+      </Text>
       <FlatList
         data={headlines}
         keyExtractor={(item) => item.url}
