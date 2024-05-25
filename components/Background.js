@@ -6,7 +6,7 @@ import { Video } from "expo-av";
 //     return (
 //       <View style={styles.container}>
 //         <Video
-//           source={require('../assets/your-video-file.mp4')}
+//           source={require('../assets/WelcomeBackgroundAnimation.mp4')}
 //           rate={1.0}
 //           volume={1.0}
 //           isMuted={true}
