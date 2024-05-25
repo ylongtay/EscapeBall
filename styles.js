@@ -10,21 +10,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  timeText: {
-    fontSize: 18,
-    marginTop: 20,
-    color: "red",
-  },
   pauseButtonContainer: {
     position: "absolute",
     bottom: 30,
     left: 0,
     right: 0,
     alignItems: "center",
+  },
+  timeText: {
+    fontSize: 18,
+    marginTop: 20,
+    color: "red",
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  announcementMessage: {
+    fontSize: 24,
+    marginBottom: 20,
   },
 });
 

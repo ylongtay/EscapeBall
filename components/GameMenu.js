@@ -43,6 +43,11 @@ const GameMenu = ({ route, navigation }) => {
     // View component to display game menu options.
     <View style={styles.centeredContainer}>
       {!gameCompleted && ( // Display the game completed message if the game is completed.
+        <Text style={styles.announcementMessage}>
+          You have completed the level!{" "}
+        </Text>
+      )}
+      {!gameCompleted && (
         <Button
           title="Resume"
           onPress={() => navigation.navigate("Game", { restart: false })}
