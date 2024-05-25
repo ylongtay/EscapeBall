@@ -11,6 +11,31 @@ const { width, height } = Dimensions.get("window");
 // Set radius of the ball.
 const ballRadius = 15;
 
+const fixedMaze0 = [
+  // Define fixed walls for the maze. Add more walls as needed.
+  // Horizontal walls.
+  { x: 0, y: 100, width: 80, height: 10 },
+  { x: 200, y: 100, width: 150, height: 10 },
+  { x: 50, y: 200, width: 100, height: 10 },
+  { x: 250, y: 200, width: 100, height: 10 },
+  { x: 100, y: 300, width: 150, height: 10 },
+  { x: 0, y: 400, width: 100, height: 10 },
+  { x: 200, y: 400, width: 150, height: 10 },
+  { x: 50, y: 500, width: 100, height: 10 },
+  { x: 250, y: 500, width: 100, height: 10 },
+
+  // Vertical walls.
+  { x: 150, y: 0, width: 10, height: 150 },
+  { x: 150, y: 200, width: 10, height: 150 },
+  { x: 100, y: 150, width: 10, height: 100 },
+  { x: 250, y: 150, width: 10, height: 100 },
+  { x: 0, y: 300, width: 10, height: 100 },
+  { x: 300, y: 300, width: 10, height: 100 },
+  { x: 50, y: 450, width: 10, height: 100 },
+  { x: 200, y: 450, width: 10, height: 100 },
+  { x: 150, y: 550, width: 10, height: 100 },
+];
+
 // Define fixed walls for the maze as an array of objects.
 const fixedMaze = [
   // Define fixed walls for the maze. Add more walls as needed.
