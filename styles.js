@@ -31,6 +31,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
+    // fontSize: 32,
+    // color: "white",
+    // marginBottom: 20,
   },
 });
 
